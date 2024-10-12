@@ -8,6 +8,19 @@ function App() {
 		const constrastCheck = new ColorContrastChecker(container);
 		console.log(constrastCheck);
 		constrastCheck.init();
+
+		setTimeout(() => {
+			const newElement = document.createElement("div");
+			newElement.classList.add("box", "box--yellow");
+			newElement.textContent = "Its  a yellow box";
+			container.appendChild(newElement);
+			const showEle = document.querySelector("#newElement");
+			showEle.style.display = "block";
+		}, 10000);
+
+		return () => {
+			constrastCheck.destroy();
+		};
 	}, []);
 
 	return (
@@ -19,6 +32,28 @@ function App() {
 			<div className="box box--green">
 				<span className="tamil"></span>
 				<span>text content</span>
+			</div>
+
+			<div className="box box--hide" id="newElement">
+				<ul className="">
+					<li className="">
+						<span className=""> Tamil </span>
+					</li>
+					<li className="">
+						<p className=""> English </p>
+					</li>
+					<li className="">
+						<div className="">
+							<input value="tamil" style={{ backgroundColor: "violet" }} />
+						</div>
+					</li>
+				</ul>
+				<h1></h1>
+				<h2></h2>
+				<h3></h3>
+				<h4></h4>
+				<h5></h5>
+				<h6></h6>
 			</div>
 		</div>
 	);

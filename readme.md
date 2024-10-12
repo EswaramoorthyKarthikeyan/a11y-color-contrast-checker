@@ -1,17 +1,11 @@
-// Usage
+// Usage for IIFE
 
 ```
-try {
-    @prop: element
-    @prop: contrast Criteria
-
-    const contrastChecker = new ColorContrastChecker($0, {
-        fontSize: "23.994px",
-        fontWeight: 700,
-        contrastThreshold: 4.5,
-    });
-    contrastChecker.init();
-} catch (error) {
-    console.error("Error initializing ColorContrastChecker:", error.message);
-}
+    try {
+        const container = document.querySelector("#container");
+        const getChecker = new colorContrast.ColorContrastChecker(container);
+        getChecker.init();
+    } catch (error) {
+        console.error("Error initializing ColorContrastChecker:", error.message);
+    }
 ```

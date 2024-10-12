@@ -10,10 +10,29 @@ class ColorContrastChecker {
 
 	init() {
 		if (document.readyState === "loading") {
-			document.addEventListener("DOMContentLoaded", () => this.checkContrastForChildren());
+			document.addEventListener("DOMContentLoaded", () => this.startObserving());
 		} else {
-			this.checkContrastForChildren();
+			this.startObserving();
 		}
+	}
+
+	startObserving() {
+		this.checkContrastForChildren();
+		this.observer = new MutationObserver((mutations, observer) => {
+			for (var mutation of mutations) {
+				if (mutation.type === "childList") {
+					console.log("A child node has been added or removed.");
+				} else if (mutation.type === "attributes") {
+					console.log("The " + mutation.attributeName + " attribute was modified.");
+				}
+				this.checkContrastForChildren();
+			}
+		});
+		this.observer.observe(this.containerElement, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+		});
 	}
 
 	getElementStyle(element) {
@@ -44,36 +63,43 @@ class ColorContrastChecker {
 	checkContrastForChildren(element = this.containerElement) {
 		const children = element.children;
 		for (const child of children) {
-			const childStyle = this.getElementStyle(child);
-			const contrast = this.calculateContrastRatio(this.getEffectiveBackgroundColor(child), childStyle.color);
-
-			let isValid = false;
-
-			// check whether the element matches the criteria or not
-			const isLargeFont = childStyle.fontSize <= this.criteriaInfo.fontSize;
-			const isBold = childStyle.fontWeight <= this.criteriaInfo.fontWeight;
-			this.contrastThreshold = isLargeFont && isBold ? 4.5 : 3.1;
-
-			if (contrast < this.contrastThreshold) {
-				child.style.border = "2px solid red";
-				// child.style["::after"].content = `${child.className} contrast ratio is ${contrast}`;
+			let hasText;
+			if ("value" in child) {
+				hasText = child.value !== ""; // Include elements with non-empty values
+			} else {
+				hasText = child.textContent !== "";
 			}
-			if (contrast > this.contrastThreshold) {
-				isValid = true;
-				child.style.border = "2px solid green";
+			console.log(child, child.tagName, hasText);
+			if (hasText) {
+				const childStyle = this.getElementStyle(child);
+				const contrast = this.calculateContrastRatio(this.getEffectiveBackgroundColor(child), childStyle.color);
+				let isValid = false;
+				// check whether the element matches the criteria or not
+				const isLargeFont = childStyle.fontSize <= this.criteriaInfo.fontSize;
+				const isBold = childStyle.fontWeight <= this.criteriaInfo.fontWeight;
+				this.contrastThreshold = isLargeFont && isBold ? 4.5 : 3.1;
+
+				if (contrast < this.contrastThreshold) {
+					child.style.border = "2px solid red";
+					// child.style["::after"].content = `${child.className} contrast ratio is ${contrast}`;
+				}
+				if (contrast > this.contrastThreshold) {
+					isValid = true;
+					child.style.border = "2px solid green";
+				}
+
+				const childStyleVal = {
+					class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
+					bgColor: this.getEffectiveBackgroundColor(child),
+					color: childStyle.color,
+					fontSize: childStyle.fontSize,
+					fontWeight: childStyle.fontWeight,
+					contrastRatio: contrast,
+					isValid: isValid,
+				};
 			}
 
-			const childStyleVal = {
-				class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
-				bgColor: this.getEffectiveBackgroundColor(child),
-				color: childStyle.color,
-				fontSize: childStyle.fontSize,
-				fontWeight: childStyle.fontWeight,
-				contrastRatio: contrast,
-				isValid: isValid,
-			};
-
-			console.table(childStyleVal);
+			// console.table(childStyleVal);
 
 			if (child.children.length > 0) {
 				this.checkContrastForChildren(child);
@@ -116,6 +142,12 @@ class ColorContrastChecker {
 			return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
 		});
 		return 0.2126 * rSRGB + 0.7152 * gSRGB + 0.0722 * bSRGB;
+	}
+
+	destroy() {
+		if (this.observer) {
+			this.observer.disconnect();
+		}
 	}
 }
 

@@ -1,13 +1,23 @@
 class h {
-  constructor(o, e = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
-    if (this.containerElement = o, this.contrastThreshold = e.contrastThreshold, this.criteriaInfo = e, !this.containerElement)
+  constructor(r, e = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
+    if (this.containerElement = r, this.contrastThreshold = e.contrastThreshold, this.criteriaInfo = e, !this.containerElement)
       throw new Error(`Container element with selector "${containerSelector}" not found.`);
   }
   init() {
-    document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => this.checkContrastForChildren()) : this.checkContrastForChildren();
+    document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => this.startObserving()) : this.startObserving();
   }
-  getElementStyle(o) {
-    const e = window.getComputedStyle(o);
+  startObserving() {
+    this.checkContrastForChildren(), this.observer = new MutationObserver((r, e) => {
+      for (var t of r)
+        t.type === "childList" ? console.log("A child node has been added or removed.") : t.type === "attributes" && console.log("The " + t.attributeName + " attribute was modified."), this.checkContrastForChildren();
+    }), this.observer.observe(this.containerElement, {
+      childList: !0,
+      subtree: !0,
+      attributes: !0
+    });
+  }
+  getElementStyle(r) {
+    const e = window.getComputedStyle(r);
     return {
       bgColor: e.backgroundColor,
       color: e.color,
@@ -15,8 +25,8 @@ class h {
       fontWeight: e.fontWeight
     };
   }
-  getEffectiveBackgroundColor(o) {
-    let e = o, t;
+  getEffectiveBackgroundColor(r) {
+    let e = r, t;
     for (; e && e !== document.body; ) {
       if (t = this.getElementStyle(e).bgColor, !this.isTransparent(t))
         return t;
@@ -24,34 +34,28 @@ class h {
     }
     return this.getElementStyle(document.body).bgColor;
   }
-  checkContrastForChildren(o = this.containerElement) {
-    const e = o.children;
+  checkContrastForChildren(r = this.containerElement) {
+    const e = r.children;
     for (const t of e) {
-      const r = this.getElementStyle(t), n = this.calculateContrastRatio(this.getEffectiveBackgroundColor(t), r.color);
-      let s = !1;
-      const i = r.fontSize <= this.criteriaInfo.fontSize, a = r.fontWeight <= this.criteriaInfo.fontWeight;
-      this.contrastThreshold = i && a ? 4.5 : 3.1, n < this.contrastThreshold && (t.style.border = "2px solid red"), n > this.contrastThreshold && (s = !0, t.style.border = "2px solid green");
-      const l = {
-        class: `${t.tagName.toLowerCase()}.${t.classList.value}`,
-        bgColor: this.getEffectiveBackgroundColor(t),
-        color: r.color,
-        fontSize: r.fontSize,
-        fontWeight: r.fontWeight,
-        contrastRatio: n,
-        isValid: s
-      };
-      console.table(l), t.children.length > 0 && this.checkContrastForChildren(t);
+      let n;
+      if ("value" in t ? n = t.value !== "" : n = t.textContent !== "", console.log(t, t.tagName, n), n) {
+        const o = this.getElementStyle(t), s = this.calculateContrastRatio(this.getEffectiveBackgroundColor(t), o.color);
+        let i = !1;
+        const a = o.fontSize <= this.criteriaInfo.fontSize, l = o.fontWeight <= this.criteriaInfo.fontWeight;
+        this.contrastThreshold = a && l ? 4.5 : 3.1, s < this.contrastThreshold && (t.style.border = "2px solid red"), s > this.contrastThreshold && (i = !0, t.style.border = "2px solid green"), `${t.tagName.toLowerCase()}${t.classList.value}`, this.getEffectiveBackgroundColor(t), o.color, o.fontSize, o.fontWeight;
+      }
+      t.children.length > 0 && this.checkContrastForChildren(t);
     }
   }
-  isTransparent(o) {
-    return this.parseColor(o).a === 0 || o === "rgba(0, 0, 0, 0)" || o === "transparent";
+  isTransparent(r) {
+    return this.parseColor(r).a === 0 || r === "rgba(0, 0, 0, 0)" || r === "transparent";
   }
-  calculateContrastRatio(o, e) {
-    const t = this.getRelativeLuminance(this.parseColor(o)), r = this.getRelativeLuminance(this.parseColor(e)), n = Math.max(t, r), s = Math.min(t, r);
-    return (n + 0.05) / (s + 0.05);
+  calculateContrastRatio(r, e) {
+    const t = this.getRelativeLuminance(this.parseColor(r)), n = this.getRelativeLuminance(this.parseColor(e)), o = Math.max(t, n), s = Math.min(t, n);
+    return (o + 0.05) / (s + 0.05);
   }
-  parseColor(o) {
-    const e = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/, t = o.match(e);
+  parseColor(r) {
+    const e = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/, t = r.match(e);
     if (t)
       return {
         r: parseInt(t[1], 10),
@@ -59,11 +63,14 @@ class h {
         b: parseInt(t[3], 10),
         a: t[4] ? parseFloat(t[4]) : 1
       };
-    throw new Error(`Invalid color format: ${o}`);
+    throw new Error(`Invalid color format: ${r}`);
   }
-  getRelativeLuminance({ r: o, g: e, b: t }) {
-    const [r, n, s] = [o, e, t].map((i) => (i /= 255, i <= 0.03928 ? i / 12.92 : Math.pow((i + 0.055) / 1.055, 2.4)));
-    return 0.2126 * r + 0.7152 * n + 0.0722 * s;
+  getRelativeLuminance({ r, g: e, b: t }) {
+    const [n, o, s] = [r, e, t].map((i) => (i /= 255, i <= 0.03928 ? i / 12.92 : Math.pow((i + 0.055) / 1.055, 2.4)));
+    return 0.2126 * n + 0.7152 * o + 0.0722 * s;
+  }
+  destroy() {
+    this.observer && this.observer.disconnect();
   }
 }
 export {

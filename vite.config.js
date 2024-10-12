@@ -11,8 +11,6 @@ export default defineConfig({
 		lib: {
 			entry: path.resolve(__dirname, "./colorContrast.js"),
 			name: "colorContrast",
-			formats: ["es", "cjs", "iife"],
-			fileName: (format) => `colorContrast.${format}.js`,
 		},
 		rollupOptions: {
 			output: [
