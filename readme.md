@@ -1,10 +1,12 @@
 // Usage
 
 ```
-@ element
-@ contrast Criteria
+
 
 try {
+    @prop: element
+    @prop: contrast Criteria
+
     const contrastChecker = new ColorContrastChecker($0, {
     fontSize: "23.994px",
     fontWeight: 700,
