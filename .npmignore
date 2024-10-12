@@ -1,0 +1,6 @@
+node_modules
+example
+src
+index.html
+vite.config.js
+.prettierrc

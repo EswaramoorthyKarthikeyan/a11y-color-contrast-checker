@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import { ColorContrastChecker } from "color-contrast-checker";
-
+import { ColorContrastChecker } from "a11y-color-contrast-checker";
 import "./App.css";
 
 function App() {
