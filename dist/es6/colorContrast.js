@@ -30,7 +30,7 @@ class h {
       const r = this.getElementStyle(t), n = this.calculateContrastRatio(this.getEffectiveBackgroundColor(t), r.color);
       let s = !1;
       const i = r.fontSize <= this.criteriaInfo.fontSize, a = r.fontWeight <= this.criteriaInfo.fontWeight;
-      this.contrastThreshold = i && a ? 4.5 : 3.1, n < this.contrastThreshold && (t.style.border = "10px solid red"), n > this.contrastThreshold && (s = !0, t.style.border = "10px solid green");
+      this.contrastThreshold = i && a ? 4.5 : 3.1, n < this.contrastThreshold && (t.style.border = "2px solid red"), n > this.contrastThreshold && (s = !0, t.style.border = "2px solid green");
       const l = {
         class: `${t.tagName.toLowerCase()}.${t.classList.value}`,
         bgColor: this.getEffectiveBackgroundColor(t),

@@ -17,7 +17,7 @@ function App() {
 			<div className="box box--orange">text content</div>
 			<div className="box box--transparent">text content</div>
 			<div className="box box--green">
-				<span className="tamil"> tamil </span>
+				<span className="tamil"></span>
 				<span>text content</span>
 			</div>
 		</div>

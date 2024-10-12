@@ -55,12 +55,12 @@ class ColorContrastChecker {
 			this.contrastThreshold = isLargeFont && isBold ? 4.5 : 3.1;
 
 			if (contrast < this.contrastThreshold) {
-				child.style.border = "10px solid red";
+				child.style.border = "2px solid red";
 				// child.style["::after"].content = `${child.className} contrast ratio is ${contrast}`;
 			}
 			if (contrast > this.contrastThreshold) {
 				isValid = true;
-				child.style.border = "10px solid green";
+				child.style.border = "2px solid green";
 			}
 
 			const childStyleVal = {
