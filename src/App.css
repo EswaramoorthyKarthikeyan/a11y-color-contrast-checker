@@ -40,9 +40,9 @@ body {
 			background-color: transparent;
 		}
 
-		&.box--green,
+		&.box--hide,
 		&.box--green {
-			background-color: #fff;
+			background-color: #583333;
 
 			.tamil {
 				background-color: #bb4545;

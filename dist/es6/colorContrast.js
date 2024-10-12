@@ -9,7 +9,7 @@ class h {
   startObserving() {
     this.checkContrastForChildren(), this.observer = new MutationObserver((r, e) => {
       for (var t of r)
-        t.type === "childList" ? console.log("A child node has been added or removed.") : t.type === "attributes" && console.log("The " + t.attributeName + " attribute was modified."), this.checkContrastForChildren();
+        t.type === "childList" ? console.log("A child node has been added or removed.") : t.type === "attributes" && console.log("The " + t.attributeName + " attribute was modified."), console.log(t.target), this.checkContrastForChildren(t.target);
     }), this.observer.observe(this.containerElement, {
       childList: !0,
       subtree: !0,
@@ -36,23 +36,35 @@ class h {
   }
   checkContrastForChildren(r = this.containerElement) {
     const e = r.children;
-    for (const t of e) {
-      let n;
-      if ("value" in t ? n = t.value !== "" : n = t.textContent !== "", console.log(t, t.tagName, n), n) {
-        const o = this.getElementStyle(t), s = this.calculateContrastRatio(this.getEffectiveBackgroundColor(t), o.color);
-        let i = !1;
-        const a = o.fontSize <= this.criteriaInfo.fontSize, l = o.fontWeight <= this.criteriaInfo.fontWeight;
-        this.contrastThreshold = a && l ? 4.5 : 3.1, s < this.contrastThreshold && (t.style.border = "2px solid red"), s > this.contrastThreshold && (i = !0, t.style.border = "2px solid green"), `${t.tagName.toLowerCase()}${t.classList.value}`, this.getEffectiveBackgroundColor(t), o.color, o.fontSize, o.fontWeight;
+    for (const t of e)
+      if (!t.hasAttribute("disabled")) {
+        if (!t.hasAttribute("data-color-contrast") && ("value" in t ? t.value !== "" : t.textContent !== "")) {
+          const o = this.getElementStyle(t), n = this.calculateContrastRatio(
+            this.getEffectiveBackgroundColor(t),
+            o.color
+          ), s = o.fontSize <= this.criteriaInfo.fontSize, a = o.fontWeight <= this.criteriaInfo.fontWeight;
+          if (this.contrastThreshold = s && a ? 4.5 : 3.1, n < this.contrastThreshold) {
+            t.setAttribute("data-color-contrast", n), t.style.border = "2px solid red";
+            const l = {
+              class: `${t.tagName.toLowerCase()}.${t.classList.value}`,
+              bgColor: this.getEffectiveBackgroundColor(t),
+              color: o.color,
+              fontSize: o.fontSize,
+              fontWeight: o.fontWeight,
+              contrastRatio: n
+            };
+            console.table(l);
+          }
+        }
+        t.children.length > 0 && this.checkContrastForChildren(t);
       }
-      t.children.length > 0 && this.checkContrastForChildren(t);
-    }
   }
   isTransparent(r) {
     return this.parseColor(r).a === 0 || r === "rgba(0, 0, 0, 0)" || r === "transparent";
   }
   calculateContrastRatio(r, e) {
-    const t = this.getRelativeLuminance(this.parseColor(r)), n = this.getRelativeLuminance(this.parseColor(e)), o = Math.max(t, n), s = Math.min(t, n);
-    return (o + 0.05) / (s + 0.05);
+    const t = this.getRelativeLuminance(this.parseColor(r)), i = this.getRelativeLuminance(this.parseColor(e)), o = Math.max(t, i), n = Math.min(t, i);
+    return (o + 0.05) / (n + 0.05);
   }
   parseColor(r) {
     const e = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/, t = r.match(e);
@@ -66,8 +78,8 @@ class h {
     throw new Error(`Invalid color format: ${r}`);
   }
   getRelativeLuminance({ r, g: e, b: t }) {
-    const [n, o, s] = [r, e, t].map((i) => (i /= 255, i <= 0.03928 ? i / 12.92 : Math.pow((i + 0.055) / 1.055, 2.4)));
-    return 0.2126 * n + 0.7152 * o + 0.0722 * s;
+    const [i, o, n] = [r, e, t].map((s) => (s /= 255, s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)));
+    return 0.2126 * i + 0.7152 * o + 0.0722 * n;
   }
   destroy() {
     this.observer && this.observer.disconnect();

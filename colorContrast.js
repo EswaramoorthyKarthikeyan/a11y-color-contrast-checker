@@ -25,7 +25,8 @@ class ColorContrastChecker {
 				} else if (mutation.type === "attributes") {
 					console.log("The " + mutation.attributeName + " attribute was modified.");
 				}
-				this.checkContrastForChildren();
+				console.log(mutation.target);
+				this.checkContrastForChildren(mutation.target);
 			}
 		});
 		this.observer.observe(this.containerElement, {
@@ -63,46 +64,38 @@ class ColorContrastChecker {
 	checkContrastForChildren(element = this.containerElement) {
 		const children = element.children;
 		for (const child of children) {
-			let hasText;
-			if ("value" in child) {
-				hasText = child.value !== ""; // Include elements with non-empty values
-			} else {
-				hasText = child.textContent !== "";
-			}
-			console.log(child, child.tagName, hasText);
-			if (hasText) {
-				const childStyle = this.getElementStyle(child);
-				const contrast = this.calculateContrastRatio(this.getEffectiveBackgroundColor(child), childStyle.color);
-				let isValid = false;
-				// check whether the element matches the criteria or not
-				const isLargeFont = childStyle.fontSize <= this.criteriaInfo.fontSize;
-				const isBold = childStyle.fontWeight <= this.criteriaInfo.fontWeight;
-				this.contrastThreshold = isLargeFont && isBold ? 4.5 : 3.1;
+			if (!child.hasAttribute("disabled")) {
+				if (!child.hasAttribute("data-color-contrast")) {
+					const hasText = "value" in child ? child.value !== "" : child.textContent !== "";
+					if (hasText) {
+						const childStyle = this.getElementStyle(child);
+						const contrast = this.calculateContrastRatio(
+							this.getEffectiveBackgroundColor(child),
+							childStyle.color,
+						);
+						// check whether the element matches the criteria or not
+						const isLargeFont = childStyle.fontSize <= this.criteriaInfo.fontSize;
+						const isBold = childStyle.fontWeight <= this.criteriaInfo.fontWeight;
+						this.contrastThreshold = isLargeFont && isBold ? 4.5 : 3.1;
 
-				if (contrast < this.contrastThreshold) {
-					child.style.border = "2px solid red";
-					// child.style["::after"].content = `${child.className} contrast ratio is ${contrast}`;
+						if (contrast < this.contrastThreshold) {
+							child.setAttribute("data-color-contrast", contrast);
+							child.style.border = "2px solid red";
+							const childStyleVal = {
+								class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
+								bgColor: this.getEffectiveBackgroundColor(child),
+								color: childStyle.color,
+								fontSize: childStyle.fontSize,
+								fontWeight: childStyle.fontWeight,
+								contrastRatio: contrast,
+							};
+							console.table(childStyleVal);
+						}
+					}
 				}
-				if (contrast > this.contrastThreshold) {
-					isValid = true;
-					child.style.border = "2px solid green";
+				if (child.children.length > 0) {
+					this.checkContrastForChildren(child);
 				}
-
-				const childStyleVal = {
-					class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
-					bgColor: this.getEffectiveBackgroundColor(child),
-					color: childStyle.color,
-					fontSize: childStyle.fontSize,
-					fontWeight: childStyle.fontWeight,
-					contrastRatio: contrast,
-					isValid: isValid,
-				};
-			}
-
-			// console.table(childStyleVal);
-
-			if (child.children.length > 0) {
-				this.checkContrastForChildren(child);
 			}
 		}
 	}
