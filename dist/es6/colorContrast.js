@@ -1,4 +1,4 @@
-class h {
+class u {
   constructor(r, e = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
     if (this.containerElement = r, this.contrastThreshold = e.contrastThreshold, this.criteriaInfo = e, !this.containerElement)
       throw new Error(`Container element with selector "${containerSelector}" not found.`);
@@ -9,7 +9,7 @@ class h {
   startObserving() {
     this.checkContrastForChildren(), this.observer = new MutationObserver((r, e) => {
       for (var t of r)
-        t.type === "childList" ? console.log("A child node has been added or removed.") : t.type === "attributes" && console.log("The " + t.attributeName + " attribute was modified."), console.log(t.target), this.checkContrastForChildren(t.target);
+        t.type === "childList" ? console.log("A child node has been added or removed.") : t.type === "attributes" && console.log("The " + t.attributeName + " attribute was modified."), this.checkContrastForChildren(t.target);
     }), this.observer.observe(this.containerElement, {
       childList: !0,
       subtree: !0,
@@ -42,10 +42,12 @@ class h {
           const o = this.getElementStyle(t), n = this.calculateContrastRatio(
             this.getEffectiveBackgroundColor(t),
             o.color
-          ), s = o.fontSize <= this.criteriaInfo.fontSize, a = o.fontWeight <= this.criteriaInfo.fontWeight;
-          if (this.contrastThreshold = s && a ? 4.5 : 3.1, n < this.contrastThreshold) {
-            t.setAttribute("data-color-contrast", n), t.style.border = "2px solid red";
-            const l = {
+          ), s = o.fontSize <= this.criteriaInfo.fontSize, c = o.fontWeight <= this.criteriaInfo.fontWeight;
+          if (this.contrastThreshold = s && c ? 4.5 : 3.1, n < this.contrastThreshold) {
+            t.setAttribute("data-color-contrast", n);
+            const a = window.getComputedStyle(t).borderWidth, l = window.getComputedStyle(t).borderStyle, d = window.getComputedStyle(t).borderColor;
+            t.setAttribute("data-border-width", a), t.setAttribute("data-border-style", l), t.setAttribute("data-border-color", d), t.style.border = "2px solid red";
+            const h = {
               class: `${t.tagName.toLowerCase()}.${t.classList.value}`,
               bgColor: this.getEffectiveBackgroundColor(t),
               color: o.color,
@@ -53,7 +55,10 @@ class h {
               fontWeight: o.fontWeight,
               contrastRatio: n
             };
-            console.table(l);
+            console.table(h);
+          } else if (t.hasAttribute("data-border-width")) {
+            const a = t.attributes["data-border-width"], l = t.attributes["data-border-style"], d = t.attributes["data-border-color"];
+            t.style.border = `${a} ${l} ${d}`;
           }
         }
         t.children.length > 0 && this.checkContrastForChildren(t);
@@ -86,6 +91,6 @@ class h {
   }
 }
 export {
-  h as ColorContrastChecker
+  u as ColorContrastChecker
 };
 //# sourceMappingURL=colorContrast.js.map

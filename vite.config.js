@@ -1,5 +1,4 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 export default defineConfig({
@@ -37,5 +36,4 @@ export default defineConfig({
 	esbuild: {
 		target: "es5", // For legacy support of ES5
 	},
-	plugins: [react()],
 });

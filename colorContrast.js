@@ -25,7 +25,7 @@ class ColorContrastChecker {
 				} else if (mutation.type === "attributes") {
 					console.log("The " + mutation.attributeName + " attribute was modified.");
 				}
-				console.log(mutation.target);
+
 				this.checkContrastForChildren(mutation.target);
 			}
 		});
@@ -80,6 +80,15 @@ class ColorContrastChecker {
 
 						if (contrast < this.contrastThreshold) {
 							child.setAttribute("data-color-contrast", contrast);
+
+							const borderWidth = window.getComputedStyle(child).borderWidth;
+							const borderStyle = window.getComputedStyle(child).borderStyle;
+							const borderColor = window.getComputedStyle(child).borderColor;
+
+							child.setAttribute("data-border-width", borderWidth);
+							child.setAttribute("data-border-style", borderStyle);
+							child.setAttribute("data-border-color", borderColor);
+
 							child.style.border = "2px solid red";
 							const childStyleVal = {
 								class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
@@ -90,6 +99,13 @@ class ColorContrastChecker {
 								contrastRatio: contrast,
 							};
 							console.table(childStyleVal);
+						} else {
+							if (child.hasAttribute("data-border-width")) {
+								const borderWidth = child.attributes["data-border-width"];
+								const borderStyle = child.attributes["data-border-style"];
+								const borderColor = child.attributes["data-border-color"];
+								child.style.border = `${borderWidth} ${borderStyle} ${borderColor}`;
+							}
 						}
 					}
 				}
