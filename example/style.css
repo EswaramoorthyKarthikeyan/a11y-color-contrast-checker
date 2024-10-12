@@ -36,8 +36,8 @@ body {
 			background-color: #fff;
 		}
 
-		&.box--gold {
-			background-color: yellow;
+		&.box--transparent {
+			background-color: transparent;
 		}
 
 		&.box--green {

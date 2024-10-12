@@ -64,13 +64,13 @@ class ColorContrastChecker {
 			}
 
 			const childStyleVal = {
-				class: child.classList.value,
+				class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
 				bgColor: this.getEffectiveBackgroundColor(child),
 				color: childStyle.color,
 				fontSize: childStyle.fontSize,
 				fontWeight: childStyle.fontWeight,
 				contrastRatio: contrast,
-				isValid,
+				isValid: isValid,
 			};
 
 			console.table(childStyleVal);
@@ -117,16 +117,4 @@ class ColorContrastChecker {
 		});
 		return 0.2126 * rSRGB + 0.7152 * gSRGB + 0.0722 * bSRGB;
 	}
-}
-
-// Usage
-try {
-	const contrastChecker = new ColorContrastChecker($0, {
-		fontSize: "23.994px",
-		fontWeight: 700,
-		contrastThreshold: 4.5,
-	});
-	contrastChecker.init();
-} catch (error) {
-	console.error("Error initializing ColorContrastChecker:", error.message);
 }

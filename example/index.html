@@ -11,12 +11,25 @@
 			<div class="box box--white">text content</div>
 			<div class="box box--yellow">text content</div>
 			<div class="box box--orange">text content</div>
-			<div class="box box--gold">text content</div>
+			<div class="box box--transparent">text content</div>
 			<div class="box box--green">
 				<span class="tamil"> tamil </span>
 				text content
 			</div>
 		</div>
-		<script src="../src/color-contrast.js"></script>
+		<script src="../lib/color-contrast.js"></script>
+		<script>
+			const container = document.querySelector("#container");
+			try {
+				var contrastChecker = new ColorContrastChecker(container, {
+					fontSize: "23.994px",
+					fontWeight: 700,
+					contrastThreshold: 4.5,
+				});
+				contrastChecker.init();
+			} catch (error) {
+				console.error("Error initializing ColorContrastChecker:", error.message);
+			}
+		</script>
 	</body>
 </html>
