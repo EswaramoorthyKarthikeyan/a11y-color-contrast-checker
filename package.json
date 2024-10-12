@@ -1,32 +1,42 @@
 {
-	"name": "wcag-1.4.3-color-contrast-checker",
+	"name": "color-contrast-checker",
 	"version": "1.0.0",
 	"description": "Plugin for check the color contrast of an element",
-	"main": "index.js",
+	"main": "colorContrast.js",
+	"module": "dist/es6/colorContrast.es.js",
+	"browser": "dist/colorContrast.iife.js",
+	"type": "module",
 	"directories": {
 		"example": "example",
-		"lib": "lib"
+		"dist": "dist"
 	},
 	"scripts": {
+		"cleanIns": "rm -rf node_modules && rm -rf package-lock.json && npm i",
+		"dev": "vite",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "./node_modules/.bin/babel src --out-dir lib",
-		"dev": "./node_modules/.bin/babel src --out-dir lib --plugins=@babel/plugin-transform-arrow-functions --presets=@babel/env"
+		"build": "vite build",
+		"serve": "vite preview"
 	},
 	"keywords": [
 		"WCAG",
-		"color-contrat",
+		"color-contrast",
 		"wcag-1.4.3"
 	],
 	"author": "Eswaramoorthy karthikeyan <eswarkarthik95@gmail.com>",
 	"license": "MIT",
+	"dependencies": {
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
 	"devDependencies": {
 		"@babel/cli": "^7.25.7",
 		"@babel/core": "^7.25.8",
-		"@babel/plugin-transform-arrow-functions": "^7.25.7",
 		"@babel/preset-env": "^7.25.8",
-		"prettier": "^3.3.3"
-	},
-	"dependencies": {
-		"@babel/polyfill": "^7.12.1"
+		"@types/react": "^18.3.10",
+		"@types/react-dom": "^18.3.0",
+		"@vitejs/plugin-react-swc": "^3.5.0",
+		"babel-loader": "^9.2.1",
+		"prettier": "^3.3.3",
+		"vite": "^5.4.8"
 	}
 }

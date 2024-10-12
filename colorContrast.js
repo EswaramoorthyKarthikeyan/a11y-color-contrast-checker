@@ -118,3 +118,5 @@ class ColorContrastChecker {
 		return 0.2126 * rSRGB + 0.7152 * gSRGB + 0.0722 * bSRGB;
 	}
 }
+
+export { ColorContrastChecker };

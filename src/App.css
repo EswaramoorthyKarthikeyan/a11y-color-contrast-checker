@@ -1,0 +1,54 @@
+body {
+	margin: 0;
+	padding: 0;
+	background-color: blue;
+}
+
+.container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	flex-wrap: wrap;
+	gap: 32px;
+	block-size: 100svh;
+	overflow: hidden;
+
+	.box {
+		display: inline-block;
+		inline-size: 150px;
+		block-size: 150px;
+		box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.4);
+
+		align-content: center;
+		text-align: center;
+		border-radius: 4px;
+
+		&.box--white {
+			background-color: #ff9800;
+		}
+
+		&.box--yellow {
+			background-color: #f57c00;
+		}
+
+		&.box--orange {
+			background-color: #fff;
+		}
+
+		&.box--transparent {
+			background-color: transparent;
+		}
+
+		&.box--green {
+			background-color: #fff;
+
+			.tamil {
+				background-color: #bb4545;
+				color: pink;
+				font-size: 24px;
+				font-weight: bold;
+			}
+		}
+	}
+}
