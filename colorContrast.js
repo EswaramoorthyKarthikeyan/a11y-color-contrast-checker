@@ -48,7 +48,7 @@ class ColorContrastChecker {
 		for (const child of children) {
 			const isValidElement = !child.hasAttribute("disabled") && !child.hasAttribute("hidden");
 
-			if (isValidElement && !child.hasAttribute("data-color-contrast")) {
+			if (isValidElement) {
 				const hasDirectText = Array.from(child.childNodes).some(
 					(node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== "",
 				);
