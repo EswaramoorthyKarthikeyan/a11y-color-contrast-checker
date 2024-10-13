@@ -1,4 +1,4 @@
-class u {
+class g {
   getColorFormat(t) {
     const r = /^#([A-Fa-f0-9]{3,4}){1,2}$/, e = /^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*([01]?\.?\d*))?\s*\)$/, n = /^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(?:,\s*([01]?\.?\d*))?\s*\)$/;
     return r.test(t) ? "hex" : e.test(t) ? t.startsWith("rgba") ? "rgba" : "rgb" : n.test(t) ? t.startsWith("hsla") ? "hsla" : "hsl" : "unknown";
@@ -83,17 +83,15 @@ class u {
 }
 class f {
   constructor(t, r = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
-    this.colorUtil = new u(), console.log(t), t || console.log("since you didn't pass the container Element, we will use the document body"), this.containerElement = t || document.body, this.contrastThreshold = r.contrastThreshold, this.criteriaInfo = r;
+    this.colorUtil = new g(), t || console.info("since you didn't pass the container Element, we will use the document body"), this.containerElement = t || document.body, this.contrastThreshold = r.contrastThreshold, this.criteriaInfo = r;
   }
   init() {
     document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => this.startObserving()) : this.startObserving();
   }
   startObserving() {
     this.checkContrastForChildren(), this.observer = new MutationObserver((t) => {
-      for (var r of t) {
-        const e = r.attributeName && (r.attributeName.startsWith("data-color-") || r.attributeName.startsWith("data-border-"));
-        r.type === "childList" ? console.log("A child node has been added or removed.") : !e && r.type === "attributes" && console.log("The " + r.attributeName + " attribute was modified."), e || this.checkContrastForChildren(r.target);
-      }
+      for (var r of t)
+        r.attributeName && (r.attributeName.startsWith("data-color-") || r.attributeName.startsWith("data-border-")) || this.checkContrastForChildren(r.target);
     }), this.observer.observe(this.containerElement, {
       childList: !0,
       subtree: !0,

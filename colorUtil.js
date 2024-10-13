@@ -137,19 +137,28 @@ class ColorUtil {
 		};
 	}
 
-	getEffectiveBackgroundColor(element) {
+	getEffectiveColor(element, colorType) {
 		let currentElement = element;
-		let bgColor;
+		let color;
 
 		while (currentElement && currentElement !== document.body) {
-			bgColor = this.getElementStyle(currentElement).bgColor;
-			if (!this.isTransparent(bgColor)) {
-				return bgColor;
+			color = colorType === "bgColor" ? getBgColor(currentElement) : getColor(currentElement);
+
+			if (!this.isTransparent(color)) {
+				return color;
 			}
 			currentElement = currentElement.parentElement;
 		}
 
-		return this.getElementStyle(document.body).bgColor;
+		return colorType === "bgColor" ? getBgColor(document.body) : getColor(document.body);
+	}
+
+	getBgColor(element) {
+		return this.getElementStyle(element).bgColor;
+	}
+
+	getColor(element) {
+		return this.getElementStyle(element).color;
 	}
 }
 

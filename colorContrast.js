@@ -2,9 +2,8 @@ import { ColorUtil } from "./colorUtil.js";
 class ColorContrastChecker {
 	constructor(containerElement, criteriaInfo = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
 		this.colorUtil = new ColorUtil();
-		console.log(containerElement);
 		if (!containerElement) {
-			console.log(`since you didn't pass the container Element, we will use the document body`);
+			console.info(`since you didn't pass the container Element, we will use the document body`);
 		}
 		this.containerElement = containerElement ? containerElement : document.body;
 		this.contrastThreshold = criteriaInfo.contrastThreshold;
@@ -28,11 +27,9 @@ class ColorContrastChecker {
 					(mutation.attributeName.startsWith("data-color-") ||
 						mutation.attributeName.startsWith("data-border-"));
 
-				if (mutation.type === "childList") {
-					console.log("A child node has been added or removed.");
-				} else if (!isContrastRelatedChange && mutation.type === "attributes") {
-					console.log("The " + mutation.attributeName + " attribute was modified.");
-				}
+				// if (mutation.type === "childList") {
+				// } else if (!isContrastRelatedChange && mutation.type === "attributes") {
+				// }
 
 				if (!isContrastRelatedChange) {
 					this.checkContrastForChildren(mutation.target);
@@ -60,8 +57,8 @@ class ColorContrastChecker {
 				if (hasText) {
 					const childStyle = this.colorUtil.getElementStyle(child);
 					const contrast = this.calculateContrastRatio(
-						this.colorUtil.getEffectiveBackgroundColor(child),
-						childStyle.color,
+						this.colorUtil.getEffectiveColor(child, "bgColor"),
+						this.colorUtil.getEffectiveColor(child, "color"),
 					);
 					// check whether the element matches the criteria or not
 					const isLargeFont = childStyle.fontSize <= this.criteriaInfo.fontSize;
@@ -79,8 +76,8 @@ class ColorContrastChecker {
 						child.style.border = "2px solid red";
 						const childStyleVal = {
 							class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
-							bgColor: this.colorUtil.getEffectiveBackgroundColor(child),
-							color: childStyle.color,
+							bgColor: this.colorUtil.getEffectiveColor(child, "bgColor"),
+							color: this.colorUtil.getEffectiveColor(child, "color"),
 							fontSize: childStyle.fontSize,
 							fontWeight: childStyle.fontWeight,
 							contrastRatio: contrast,
