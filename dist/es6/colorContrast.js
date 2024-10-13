@@ -1,4 +1,4 @@
-class u {
+class g {
   constructor(r, e = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
     if (this.containerElement = r, this.contrastThreshold = e.contrastThreshold, this.criteriaInfo = e, !this.containerElement)
       throw new Error(`Container element with selector "${containerSelector}" not found.`);
@@ -8,8 +8,10 @@ class u {
   }
   startObserving() {
     this.checkContrastForChildren(), this.observer = new MutationObserver((r, e) => {
-      for (var t of r)
-        t.type === "childList" ? console.log("A child node has been added or removed.") : t.type === "attributes" && console.log("The " + t.attributeName + " attribute was modified."), this.checkContrastForChildren(t.target);
+      for (var t of r) {
+        const s = t.attributeName && (t.attributeName.startsWith("data-color-") || t.attributeName.startsWith("data-border-"));
+        t.type === "childList" ? console.log("A child node has been added or removed.") : !s && t.type === "attributes" && console.log("The " + t.attributeName + " attribute was modified."), s || this.checkContrastForChildren(t.target);
+      }
     }), this.observer.observe(this.containerElement, {
       childList: !0,
       subtree: !0,
@@ -42,8 +44,8 @@ class u {
           const o = this.getElementStyle(t), n = this.calculateContrastRatio(
             this.getEffectiveBackgroundColor(t),
             o.color
-          ), s = o.fontSize <= this.criteriaInfo.fontSize, c = o.fontWeight <= this.criteriaInfo.fontWeight;
-          if (this.contrastThreshold = s && c ? 4.5 : 3.1, n < this.contrastThreshold) {
+          ), i = o.fontSize <= this.criteriaInfo.fontSize, c = o.fontWeight <= this.criteriaInfo.fontWeight;
+          if (this.contrastThreshold = i && c ? 4.5 : 3.1, n < this.contrastThreshold) {
             t.setAttribute("data-color-contrast", n);
             const a = window.getComputedStyle(t).borderWidth, l = window.getComputedStyle(t).borderStyle, d = window.getComputedStyle(t).borderColor;
             t.setAttribute("data-border-width", a), t.setAttribute("data-border-style", l), t.setAttribute("data-border-color", d), t.style.border = "2px solid red";
@@ -68,7 +70,7 @@ class u {
     return this.parseColor(r).a === 0 || r === "rgba(0, 0, 0, 0)" || r === "transparent";
   }
   calculateContrastRatio(r, e) {
-    const t = this.getRelativeLuminance(this.parseColor(r)), i = this.getRelativeLuminance(this.parseColor(e)), o = Math.max(t, i), n = Math.min(t, i);
+    const t = this.getRelativeLuminance(this.parseColor(r)), s = this.getRelativeLuminance(this.parseColor(e)), o = Math.max(t, s), n = Math.min(t, s);
     return (o + 0.05) / (n + 0.05);
   }
   parseColor(r) {
@@ -83,14 +85,14 @@ class u {
     throw new Error(`Invalid color format: ${r}`);
   }
   getRelativeLuminance({ r, g: e, b: t }) {
-    const [i, o, n] = [r, e, t].map((s) => (s /= 255, s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)));
-    return 0.2126 * i + 0.7152 * o + 0.0722 * n;
+    const [s, o, n] = [r, e, t].map((i) => (i /= 255, i <= 0.03928 ? i / 12.92 : Math.pow((i + 0.055) / 1.055, 2.4)));
+    return 0.2126 * s + 0.7152 * o + 0.0722 * n;
   }
   destroy() {
     this.observer && this.observer.disconnect();
   }
 }
 export {
-  u as ColorContrastChecker
+  g as ColorContrastChecker
 };
 //# sourceMappingURL=colorContrast.js.map

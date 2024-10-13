@@ -20,13 +20,20 @@ class ColorContrastChecker {
 		this.checkContrastForChildren();
 		this.observer = new MutationObserver((mutations, observer) => {
 			for (var mutation of mutations) {
+				const isContrastRelatedChange =
+					mutation.attributeName &&
+					(mutation.attributeName.startsWith("data-color-") ||
+						mutation.attributeName.startsWith("data-border-"));
+
 				if (mutation.type === "childList") {
 					console.log("A child node has been added or removed.");
-				} else if (mutation.type === "attributes") {
+				} else if (!isContrastRelatedChange && mutation.type === "attributes") {
 					console.log("The " + mutation.attributeName + " attribute was modified.");
 				}
 
-				this.checkContrastForChildren(mutation.target);
+				if (!isContrastRelatedChange) {
+					this.checkContrastForChildren(mutation.target);
+				}
 			}
 		});
 		this.observer.observe(this.containerElement, {
