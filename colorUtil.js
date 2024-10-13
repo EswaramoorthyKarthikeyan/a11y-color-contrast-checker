@@ -101,7 +101,6 @@ class ColorUtil {
 		if (this.getColorFormat(color) !== "rgb" && this.getColorFormat(color) !== "rgba") {
 			color = this.toRgba(this.getColorFormat(color));
 		}
-		console.log(color);
 		const rgbaRegex = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/;
 		const match = color.match(rgbaRegex);
 		if (match) {
