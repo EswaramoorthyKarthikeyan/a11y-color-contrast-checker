@@ -40,9 +40,7 @@ class g {
 }
 class f {
   constructor(r, e = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
-    if (this.containerElement = r, this.contrastThreshold = e.contrastThreshold, this.criteriaInfo = e, !this.containerElement)
-      throw new Error(`Container element with selector "${containerSelector}" not found.`);
-    this.colorUtil = new g();
+    this.colorUtil = new g(), console.log(r), r || console.log("since you didn't pass the container Element, we will use the document body"), this.containerElement = r || document.body, this.contrastThreshold = e.contrastThreshold, this.criteriaInfo = e;
   }
   init() {
     document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => this.startObserving()) : this.startObserving();

@@ -17,7 +17,8 @@ function App() {
 	}, []);
 
 	return (
-		<div className="container" id="container">
+		// <div className="container" id="container">
+		<div className="container">
 			<div className="box box--white">text content</div>
 			<div className="box box--yellow">text content</div>
 			<div className="box box--orange">text content</div>

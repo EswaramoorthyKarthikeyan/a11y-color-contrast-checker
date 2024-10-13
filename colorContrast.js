@@ -1,14 +1,14 @@
 import { ColorUtil } from "./colorUtil.js";
 class ColorContrastChecker {
 	constructor(containerElement, criteriaInfo = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
-		this.containerElement = containerElement;
+		this.colorUtil = new ColorUtil();
+		console.log(containerElement);
+		if (!containerElement) {
+			console.log(`since you didn't pass the container Element, we will use the document body`);
+		}
+		this.containerElement = containerElement ? containerElement : document.body;
 		this.contrastThreshold = criteriaInfo.contrastThreshold;
 		this.criteriaInfo = criteriaInfo;
-		if (!this.containerElement) {
-			throw new Error(`Container element with selector "${containerSelector}" not found.`);
-		}
-
-		this.colorUtil = new ColorUtil();
 	}
 
 	init() {

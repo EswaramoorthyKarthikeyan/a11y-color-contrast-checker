@@ -1,8 +1,8 @@
 node_modules
+color-contrast-checker
 example
 src
-index.html
-vite.config.js
 .prettierrc
+*.html
+*.css
 *.map
-color-contrast-checker
