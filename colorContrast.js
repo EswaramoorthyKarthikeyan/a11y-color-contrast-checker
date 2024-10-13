@@ -1,3 +1,4 @@
+import { ColorUtil } from "./colorUtil.js";
 class ColorContrastChecker {
 	constructor(containerElement, criteriaInfo = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
 		this.containerElement = containerElement;
@@ -6,6 +7,8 @@ class ColorContrastChecker {
 		if (!this.containerElement) {
 			throw new Error(`Container element with selector "${containerSelector}" not found.`);
 		}
+
+		this.colorUtil = new ColorUtil();
 	}
 
 	init() {
@@ -18,7 +21,7 @@ class ColorContrastChecker {
 
 	startObserving() {
 		this.checkContrastForChildren();
-		this.observer = new MutationObserver((mutations, observer) => {
+		this.observer = new MutationObserver((mutations) => {
 			for (var mutation of mutations) {
 				const isContrastRelatedChange =
 					mutation.attributeName &&
@@ -43,76 +46,53 @@ class ColorContrastChecker {
 		});
 	}
 
-	getElementStyle(element) {
-		const style = window.getComputedStyle(element);
-		return {
-			bgColor: style.backgroundColor,
-			color: style.color,
-			fontSize: style.fontSize,
-			fontWeight: style.fontWeight,
-		};
-	}
-
-	getEffectiveBackgroundColor(element) {
-		let currentElement = element;
-		let bgColor;
-
-		while (currentElement && currentElement !== document.body) {
-			bgColor = this.getElementStyle(currentElement).bgColor;
-			if (!this.isTransparent(bgColor)) {
-				return bgColor;
-			}
-			currentElement = currentElement.parentElement;
-		}
-
-		return this.getElementStyle(document.body).bgColor;
-	}
-
 	checkContrastForChildren(element = this.containerElement) {
 		const children = element.children;
 		for (const child of children) {
-			if (!child.hasAttribute("disabled")) {
-				if (!child.hasAttribute("data-color-contrast")) {
-					const hasText = "value" in child ? child.value !== "" : child.textContent !== "";
-					if (hasText) {
-						const childStyle = this.getElementStyle(child);
-						const contrast = this.calculateContrastRatio(
-							this.getEffectiveBackgroundColor(child),
-							childStyle.color,
-						);
-						// check whether the element matches the criteria or not
-						const isLargeFont = childStyle.fontSize <= this.criteriaInfo.fontSize;
-						const isBold = childStyle.fontWeight <= this.criteriaInfo.fontWeight;
-						this.contrastThreshold = isLargeFont && isBold ? 4.5 : 3.1;
+			const isValidElement = !child.hasAttribute("disabled") && !child.hasAttribute("hidden");
 
-						if (contrast < this.contrastThreshold) {
-							child.setAttribute("data-color-contrast", contrast);
+			if (isValidElement && !child.hasAttribute("data-color-contrast")) {
+				const hasDirectText = Array.from(child.childNodes).some(
+					(node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== "",
+				);
 
-							const borderWidth = window.getComputedStyle(child).borderWidth;
-							const borderStyle = window.getComputedStyle(child).borderStyle;
-							const borderColor = window.getComputedStyle(child).borderColor;
+				const hasText = "value" in child ? child.value !== "" : hasDirectText;
+				if (hasText) {
+					const childStyle = this.colorUtil.getElementStyle(child);
+					const contrast = this.calculateContrastRatio(
+						this.colorUtil.getEffectiveBackgroundColor(child),
+						childStyle.color,
+					);
+					// check whether the element matches the criteria or not
+					const isLargeFont = childStyle.fontSize <= this.criteriaInfo.fontSize;
+					const isBold = childStyle.fontWeight <= this.criteriaInfo.fontWeight;
+					this.contrastThreshold = isLargeFont && isBold ? 4.5 : 3.1;
 
-							child.setAttribute("data-border-width", borderWidth);
-							child.setAttribute("data-border-style", borderStyle);
-							child.setAttribute("data-border-color", borderColor);
+					if (contrast < this.contrastThreshold) {
+						const currEleStyle = window.getComputedStyle(child);
 
-							child.style.border = "2px solid red";
-							const childStyleVal = {
-								class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
-								bgColor: this.getEffectiveBackgroundColor(child),
-								color: childStyle.color,
-								fontSize: childStyle.fontSize,
-								fontWeight: childStyle.fontWeight,
-								contrastRatio: contrast,
-							};
-							console.table(childStyleVal);
-						} else {
-							if (child.hasAttribute("data-border-width")) {
-								const borderWidth = child.attributes["data-border-width"];
-								const borderStyle = child.attributes["data-border-style"];
-								const borderColor = child.attributes["data-border-color"];
-								child.style.border = `${borderWidth} ${borderStyle} ${borderColor}`;
-							}
+						child.setAttribute("data-color-contrast", contrast);
+						child.setAttribute("data-border-width", currEleStyle.borderWidth);
+						child.setAttribute("data-border-style", currEleStyle.borderStyle);
+						child.setAttribute("data-border-color", currEleStyle.borderColor);
+
+						child.style.border = "2px solid red";
+						const childStyleVal = {
+							class: `${child.tagName.toLowerCase()}.${child.classList.value}`,
+							bgColor: this.colorUtil.getEffectiveBackgroundColor(child),
+							color: childStyle.color,
+							fontSize: childStyle.fontSize,
+							fontWeight: childStyle.fontWeight,
+							contrastRatio: contrast,
+							content: child.textContent,
+						};
+						console.table(childStyleVal);
+					} else {
+						if (child.hasAttribute("data-border-width")) {
+							const borderWidth = child.attributes["data-border-width"];
+							const borderStyle = child.attributes["data-border-style"];
+							const borderColor = child.attributes["data-border-color"];
+							child.style.border = `${borderWidth} ${borderStyle} ${borderColor}`;
 						}
 					}
 				}
@@ -123,41 +103,14 @@ class ColorContrastChecker {
 		}
 	}
 
-	isTransparent(color) {
-		const parsed = this.parseColor(color);
-		return parsed.a === 0 || color === "rgba(0, 0, 0, 0)" || color === "transparent";
-	}
-
 	calculateContrastRatio(bgColor, textColor) {
-		const bgLuminance = this.getRelativeLuminance(this.parseColor(bgColor));
-		const textLuminance = this.getRelativeLuminance(this.parseColor(textColor));
+		const bgLuminance = this.colorUtil.getRelativeLuminance(this.colorUtil.parseColor(bgColor));
+		const textLuminance = this.colorUtil.getRelativeLuminance(this.colorUtil.parseColor(textColor));
 
 		const lighter = Math.max(bgLuminance, textLuminance);
 		const darker = Math.min(bgLuminance, textLuminance);
 
 		return (lighter + 0.05) / (darker + 0.05);
-	}
-
-	parseColor(color) {
-		const rgbaRegex = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/;
-		const match = color.match(rgbaRegex);
-		if (match) {
-			return {
-				r: parseInt(match[1], 10),
-				g: parseInt(match[2], 10),
-				b: parseInt(match[3], 10),
-				a: match[4] ? parseFloat(match[4]) : 1,
-			};
-		}
-		throw new Error(`Invalid color format: ${color}`);
-	}
-
-	getRelativeLuminance({ r, g, b }) {
-		const [rSRGB, gSRGB, bSRGB] = [r, g, b].map((c) => {
-			c /= 255;
-			return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-		});
-		return 0.2126 * rSRGB + 0.7152 * gSRGB + 0.0722 * bSRGB;
 	}
 
 	destroy() {

@@ -24,11 +24,11 @@ function App() {
 			<div className="box box--transparent"></div>
 			<div className="box box--green">
 				<span className="tamil"> tamil </span>
-				text content
+				<span>text content</span>
 			</div>
 			<div className="box box--dummy">
 				<span className="tamil"> tamil </span>
-				text content
+				<span>text content</span>
 			</div>
 		</div>
 	);
