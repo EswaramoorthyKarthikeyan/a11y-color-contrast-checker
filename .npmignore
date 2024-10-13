@@ -5,3 +5,4 @@ index.html
 vite.config.js
 .prettierrc
 *.map
+color-contrast-checker
