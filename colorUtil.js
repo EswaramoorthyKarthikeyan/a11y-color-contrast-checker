@@ -142,7 +142,7 @@ class ColorUtil {
 		let color;
 
 		while (currentElement && currentElement !== document.body) {
-			color = colorType === "bgColor" ? getBgColor(currentElement) : getColor(currentElement);
+			color = colorType === "bgColor" ? this.getBgColor(currentElement) : this.getColor(currentElement);
 
 			if (!this.isTransparent(color)) {
 				return color;
@@ -150,7 +150,7 @@ class ColorUtil {
 			currentElement = currentElement.parentElement;
 		}
 
-		return colorType === "bgColor" ? getBgColor(document.body) : getColor(document.body);
+		return colorType === "bgColor" ? this.getBgColor(document.body) : this.getColor(document.body);
 	}
 
 	getBgColor(element) {

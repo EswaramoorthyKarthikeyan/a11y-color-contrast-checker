@@ -1,40 +1,40 @@
-class g {
+class u {
   getColorFormat(t) {
-    const r = /^#([A-Fa-f0-9]{3,4}){1,2}$/, e = /^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*([01]?\.?\d*))?\s*\)$/, n = /^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(?:,\s*([01]?\.?\d*))?\s*\)$/;
-    return r.test(t) ? "hex" : e.test(t) ? t.startsWith("rgba") ? "rgba" : "rgb" : n.test(t) ? t.startsWith("hsla") ? "hsla" : "hsl" : "unknown";
+    const r = /^#([A-Fa-f0-9]{3,4}){1,2}$/, e = /^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*([01]?\.?\d*))?\s*\)$/, a = /^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(?:,\s*([01]?\.?\d*))?\s*\)$/;
+    return r.test(t) ? "hex" : e.test(t) ? t.startsWith("rgba") ? "rgba" : "rgb" : a.test(t) ? t.startsWith("hsla") ? "hsla" : "hsl" : "unknown";
   }
   hexToRgba(t, r = 1) {
     t = t.replace(/^#/, ""), t.length === 3 && (t = t.split("").map((i) => i + i).join(""));
-    const e = parseInt(t.substring(0, 2), 16), n = parseInt(t.substring(2, 4), 16), o = parseInt(t.substring(4, 6), 16);
-    return `rgba(${e}, ${n}, ${o}, ${r})`;
+    const e = parseInt(t.substring(0, 2), 16), a = parseInt(t.substring(2, 4), 16), s = parseInt(t.substring(4, 6), 16);
+    return `rgba(${e}, ${a}, ${s}, ${r})`;
   }
-  hslToRgba(t, r, e, n = 1) {
+  hslToRgba(t, r, e, a = 1) {
     r /= 100, e /= 100;
-    const o = (1 - Math.abs(2 * e - 1)) * r, i = e - o / 2;
-    let s, a, l;
+    const s = (1 - Math.abs(2 * e - 1)) * r, i = e - s / 2;
+    let o, n, l;
     t %= 360, t /= 60;
-    const b = Math.floor(t), c = t - b, d = o * (1 - c * c), h = o * (1 - c * c * c);
+    const b = Math.floor(t), c = t - b, h = s * (1 - c * c), d = s * (1 - c * c * c);
     switch (b % 6) {
       case 0:
-        s = o, a = h, l = 0;
+        o = s, n = d, l = 0;
         break;
       case 1:
-        s = d, a = o, l = 0;
+        o = h, n = s, l = 0;
         break;
       case 2:
-        s = 0, a = o, l = h;
+        o = 0, n = s, l = d;
         break;
       case 3:
-        s = 0, a = d, l = o;
+        o = 0, n = h, l = s;
         break;
       case 4:
-        s = h, a = 0, l = o;
+        o = d, n = 0, l = s;
         break;
       case 5:
-        s = o, a = 0, l = d;
+        o = s, n = 0, l = h;
         break;
     }
-    return s = Math.round((s + i) * 255), a = Math.round((a + i) * 255), l = Math.round((l + i) * 255), `rgba(${s}, ${a}, ${l}, ${n})`;
+    return o = Math.round((o + i) * 255), n = Math.round((n + i) * 255), l = Math.round((l + i) * 255), `rgba(${o}, ${n}, ${l}, ${a})`;
   }
   toRgba(t) {
     if (/^#/.test(t))
@@ -59,8 +59,8 @@ class g {
     return this.parseColor(t).a === 0 || t === "rgba(0, 0, 0, 0)" || t === "transparent";
   }
   getRelativeLuminance({ r: t, g: r, b: e }) {
-    const [n, o, i] = [t, r, e].map((s) => (s /= 255, s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)));
-    return 0.2126 * n + 0.7152 * o + 0.0722 * i;
+    const [a, s, i] = [t, r, e].map((o) => (o /= 255, o <= 0.03928 ? o / 12.92 : Math.pow((o + 0.055) / 1.055, 2.4)));
+    return 0.2126 * a + 0.7152 * s + 0.0722 * i;
   }
   getElementStyle(t) {
     const r = window.getComputedStyle(t);
@@ -71,19 +71,25 @@ class g {
       fontWeight: r.fontWeight
     };
   }
-  getEffectiveBackgroundColor(t) {
-    let r = t, e;
-    for (; r && r !== document.body; ) {
-      if (e = this.getElementStyle(r).bgColor, !this.isTransparent(e))
-        return e;
-      r = r.parentElement;
+  getEffectiveColor(t, r) {
+    let e = t, a;
+    for (; e && e !== document.body; ) {
+      if (a = r === "bgColor" ? this.getBgColor(e) : this.getColor(e), !this.isTransparent(a))
+        return a;
+      e = e.parentElement;
     }
-    return this.getElementStyle(document.body).bgColor;
+    return r === "bgColor" ? this.getBgColor(document.body) : this.getColor(document.body);
+  }
+  getBgColor(t) {
+    return this.getElementStyle(t).bgColor;
+  }
+  getColor(t) {
+    return this.getElementStyle(t).color;
   }
 }
 class f {
   constructor(t, r = { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }) {
-    this.colorUtil = new g(), t || console.info("since you didn't pass the container Element, we will use the document body"), this.containerElement = t || document.body, this.contrastThreshold = r.contrastThreshold, this.criteriaInfo = r;
+    this.colorUtil = new u(), t || console.info("since you didn't pass the container Element, we will use the document body"), this.containerElement = t || document.body, this.contrastThreshold = r.contrastThreshold, this.criteriaInfo = r;
   }
   init() {
     document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => this.startObserving()) : this.startObserving();
@@ -102,38 +108,38 @@ class f {
     const r = t.children;
     for (const e of r)
       if (!e.hasAttribute("disabled") && !e.hasAttribute("hidden") && !e.hasAttribute("data-color-contrast")) {
-        const o = Array.from(e.childNodes).some(
-          (s) => s.nodeType === Node.TEXT_NODE && s.textContent.trim() !== ""
+        const s = Array.from(e.childNodes).some(
+          (o) => o.nodeType === Node.TEXT_NODE && o.textContent.trim() !== ""
         );
-        if ("value" in e ? e.value !== "" : o) {
-          const s = this.colorUtil.getElementStyle(e), a = this.calculateContrastRatio(
-            this.colorUtil.getEffectiveBackgroundColor(e),
-            s.color
-          ), l = s.fontSize <= this.criteriaInfo.fontSize, b = s.fontWeight <= this.criteriaInfo.fontWeight;
-          if (this.contrastThreshold = l && b ? 4.5 : 3.1, a < this.contrastThreshold) {
+        if ("value" in e ? e.value !== "" : s) {
+          const o = this.colorUtil.getElementStyle(e), n = this.calculateContrastRatio(
+            this.colorUtil.getEffectiveColor(e, "bgColor"),
+            this.colorUtil.getEffectiveColor(e, "color")
+          ), l = o.fontSize <= this.criteriaInfo.fontSize, b = o.fontWeight <= this.criteriaInfo.fontWeight;
+          if (this.contrastThreshold = l && b ? 4.5 : 3.1, n < this.contrastThreshold) {
             const c = window.getComputedStyle(e);
-            e.setAttribute("data-color-contrast", a), e.setAttribute("data-border-width", c.borderWidth), e.setAttribute("data-border-style", c.borderStyle), e.setAttribute("data-border-color", c.borderColor), e.style.border = "2px solid red";
-            const d = {
+            e.setAttribute("data-color-contrast", n), e.setAttribute("data-border-width", c.borderWidth), e.setAttribute("data-border-style", c.borderStyle), e.setAttribute("data-border-color", c.borderColor), e.style.border = "2px solid red";
+            const h = {
               class: `${e.tagName.toLowerCase()}.${e.classList.value}`,
-              bgColor: this.colorUtil.getEffectiveBackgroundColor(e),
-              color: s.color,
-              fontSize: s.fontSize,
-              fontWeight: s.fontWeight,
-              contrastRatio: a,
+              bgColor: this.colorUtil.getEffectiveColor(e, "bgColor"),
+              color: this.colorUtil.getEffectiveColor(e, "color"),
+              fontSize: o.fontSize,
+              fontWeight: o.fontWeight,
+              contrastRatio: n,
               content: e.textContent
             };
-            console.table(d);
+            console.table(h);
           } else if (e.hasAttribute("data-border-width")) {
-            const c = e.attributes["data-border-width"], d = e.attributes["data-border-style"], h = e.attributes["data-border-color"];
-            e.style.border = `${c} ${d} ${h}`;
+            const c = e.attributes["data-border-width"], h = e.attributes["data-border-style"], d = e.attributes["data-border-color"];
+            e.style.border = `${c} ${h} ${d}`;
           }
         }
         e.children.length > 0 && this.checkContrastForChildren(e);
       }
   }
   calculateContrastRatio(t, r) {
-    const e = this.colorUtil.getRelativeLuminance(this.colorUtil.parseColor(t)), n = this.colorUtil.getRelativeLuminance(this.colorUtil.parseColor(r)), o = Math.max(e, n), i = Math.min(e, n);
-    return (o + 0.05) / (i + 0.05);
+    const e = this.colorUtil.getRelativeLuminance(this.colorUtil.parseColor(t)), a = this.colorUtil.getRelativeLuminance(this.colorUtil.parseColor(r)), s = Math.max(e, a), i = Math.min(e, a);
+    return (s + 0.05) / (i + 0.05);
   }
   destroy() {
     this.observer && this.observer.disconnect();
