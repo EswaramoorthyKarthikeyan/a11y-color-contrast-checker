@@ -52,8 +52,10 @@ class ColorContrastChecker {
 				const hasDirectText = Array.from(child.childNodes).some(
 					(node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== "",
 				);
-
-				const hasText = "value" in child ? child.value !== "" : hasDirectText;
+				const hasText =
+					"value" in child
+						? child.value !== "" && child.tagName.toLowerCase() === "li" && child.value !== 0
+						: hasDirectText;
 				if (hasText) {
 					const childStyle = this.colorUtil.getElementStyle(child);
 					const contrast = this.calculateContrastRatio(
@@ -66,6 +68,8 @@ class ColorContrastChecker {
 					this.contrastThreshold = isLargeFont && isBold ? 4.5 : 3.1;
 
 					if (contrast < this.contrastThreshold) {
+						console.log(hasDirectText, "has text content", child.tagName, hasText, "value" in child);
+
 						const currEleStyle = window.getComputedStyle(child);
 
 						child.setAttribute("data-color-contrast", contrast);

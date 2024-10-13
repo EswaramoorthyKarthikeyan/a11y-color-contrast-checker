@@ -150,7 +150,15 @@ class ColorUtil {
 			currentElement = currentElement.parentElement;
 		}
 
-		return colorType === "bgColor" ? this.getBgColor(document.body) : this.getColor(document.body);
+		const bodyBg = !this.isTransparent(this.getBgColor(document.body))
+			? this.getBgColor(document.body)
+			: this.getBgColor(document.documentElement);
+
+		const bodyColor = !this.isTransparent(this.getColor(document.body))
+			? this.getColor(document.body)
+			: this.getColor(document.documentElement);
+
+		return colorType === "bgColor" ? bodyBg : bodyColor;
 	}
 
 	getBgColor(element) {
