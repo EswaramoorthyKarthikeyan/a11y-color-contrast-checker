@@ -1,6 +1,6 @@
 {
 	"name": "a11y-color-contrast-checker",
-	"version": "1.0.14",
+	"version": "1.0.15",
 	"description": "Plugin for check the color contrast of an element",
 	"main": "dist/es5/colorContrast.js",
 	"module": "dist/es6/colorContrast.js",
