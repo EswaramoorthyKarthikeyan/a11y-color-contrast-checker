@@ -44,7 +44,7 @@ class u {
     throw new Error("Unsupported color format");
   }
   parseColor(t) {
-    this.getColorFormat(t) !== "rgb" && this.getColorFormat(t) !== "rgba" && (t = this.toRgba(this.getColorFormat(t))), console.log(t);
+    this.getColorFormat(t) !== "rgb" && this.getColorFormat(t) !== "rgba" && (t = this.toRgba(this.getColorFormat(t)));
     const r = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/, e = t.match(r);
     if (e)
       return {
