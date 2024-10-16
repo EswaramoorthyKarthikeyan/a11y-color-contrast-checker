@@ -1,21 +1,17 @@
 {
 	"name": "a11y-color-contrast-checker",
-	"version": "1.0.22",
-	"description": "Plugin for check the color contrast of an element",
+	"version": "1.0.23",
+	"description": "A lightweight utility for checking color contrast ratios between foreground and background colors in the DOM, ensuring accessibility compliance with WCAG guidelines. Perfect for web developers and designers aiming to create inclusive digital experiences",
 	"main": "dist/es5/colorContrast.js",
 	"module": "dist/es6/colorContrast.js",
 	"browser": "dist/iife/colorContrast.js",
 	"type": "module",
 	"directories": {
-		"example": "example",
 		"dist": "dist"
 	},
 	"scripts": {
 		"cleanIns": "rm -rf node_modules && rm -rf package-lock.json && npm i",
-		"dev": "vite",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "vite build",
-		"serve": "vite preview"
+		"build": "vite build"
 	},
 	"keywords": [
 		"WCAG",
@@ -23,7 +19,10 @@
 		"wcag-1.4.3",
 		"a11y",
 		"Accessibility",
-		"contrast browser plugin"
+		"contrast browser plugin",
+		"color-contrast-react",
+		"color-contrast-es5",
+		"color-contrast-iife"
 	],
 	"author": "Eswaramoorthy karthikeyan <eswarkarthik95@gmail.com>",
 	"license": "MIT",
