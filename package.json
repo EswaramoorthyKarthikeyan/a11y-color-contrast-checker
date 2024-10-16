@@ -20,7 +20,10 @@
 	"keywords": [
 		"WCAG",
 		"color-contrast",
-		"wcag-1.4.3"
+		"wcag-1.4.3",
+		"a11y",
+		"Accessibility",
+		"contrast browser plugin"
 	],
 	"author": "Eswaramoorthy karthikeyan <eswarkarthik95@gmail.com>",
 	"license": "MIT",
