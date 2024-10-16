@@ -23,6 +23,7 @@ body {
 		align-content: center;
 		text-align: center;
 		border-radius: 4px;
+		transition: all 0.3s linear;
 
 		&.box--white {
 			background-color: #ff9800;
@@ -54,6 +55,10 @@ body {
 		&.box--red {
 			background-color: red;
 			color: blue;
+
+			&:hover {
+				background-color: #fff;
+			}
 		}
 	}
 }

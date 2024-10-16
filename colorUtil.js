@@ -150,15 +150,19 @@ class ColorUtil {
 			currentElement = currentElement.parentElement;
 		}
 
-		const bodyBg = !this.isTransparent(this.getBgColor(document.body))
+		const rootBg = !this.isTransparent(this.getBgColor(document.body))
 			? this.getBgColor(document.body)
-			: this.getBgColor(document.documentElement);
+			: !this.isTransparent(this.getBgColor(document.documentElement))
+				? this.getBgColor(document.documentElement)
+				: "rgba(255,255,255,1)";
 
-		const bodyColor = !this.isTransparent(this.getColor(document.body))
+		const rootColor = !this.isTransparent(this.getColor(document.body))
 			? this.getColor(document.body)
-			: this.getColor(document.documentElement);
+			: !this.isTransparent(this.getColor(document.documentElement))
+				? this.getColor(document.documentElement)
+				: "rgba(255,255,255,1)";
 
-		return colorType === "bgColor" ? bodyBg : bodyColor;
+		return colorType === "bgColor" ? rootBg : rootColor;
 	}
 
 	getBgColor(element) {
@@ -167,6 +171,13 @@ class ColorUtil {
 
 	getColor(element) {
 		return this.getElementStyle(element).color;
+	}
+
+	setStyle(element, styleObj) {
+		for (const property in styleObj) {
+			element.style[property] = styleObj[property];
+		}
+		return;
 	}
 }
 

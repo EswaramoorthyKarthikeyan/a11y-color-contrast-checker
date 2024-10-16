@@ -40,13 +40,13 @@ import { ColorContrastChecker } from "a11y-color-contrast-checker";
 function App() {
 	useEffect(() => {
 		const getContainerElement = document.querySelector("#container");
-        // Creating instance for the iife class.
+		// Creating instance for the iife class.
 		const colorChecker = new ColorContrastChecker(getContainerElement);
 
-        // Initiatizing
+		// Initiatizing
 		colorChecker.init();
 
-        // Mutating the dom after 10 sec to check the plugin
+		// Mutating the dom after 10 sec to check the plugin
 		setTimeout(() => {
 			const divElement = document.createElement("div");
 			divElement.classList.add("box", "box--red");
@@ -107,13 +107,12 @@ If you are not using a module bundler, you can include the package in your HTML 
 		<script src="../dist/iife/colorContrast.js"></script>
 		<script>
 			try {
-				const container = document.querySelector("#container");
-                // Creating instance for the iife class.
-				const getChecker = new colorContrast.ColorContrastChecker(container);
-                // Initiatizing
+				// Creating instance for the iife class.
+				const getChecker = new colorContrast.ColorContrastChecke();
+				// Initiatizing
 				getChecker.init();
 
-                // Mutating the dom after 10 sec to check the plugin
+				// Mutating the dom after 10 sec to check the plugin
 				setTimeout(() => {
 					const divElement = document.createElement("div");
 					divElement.classList.add("box", "box--red");
@@ -139,6 +138,10 @@ ColorContrastChecker(container)
 `init()`
 
 -   Initializes the checker and scans the provided container for any elements that fail to meet WCAG standards.
+
+`destroy()`
+
+-   Use it when you're done observing changes to clean up resources efficiently.
 
 ## License
 
