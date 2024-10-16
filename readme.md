@@ -146,3 +146,13 @@ ColorContrastChecker(container)
 ## License
 
 This project is licensed under the MIT License.
+
+
+## Exmaple
+
+<img width="427" alt="Screenshot 2024-10-17 at 00 19 25" src="https://github.com/user-attachments/assets/2c7cb13b-93fd-4532-9134-7acfdaf07de1">
+
+
+
+
+
