@@ -16,25 +16,24 @@
 				<span class="tamil"> tamil </span>
 				<span>text content</span>
 			</div>
-			<div class="box box--dummy">
+			<div class="box box--dummy" id="dummyContent">
 				<span class="tamil"> tamil </span>
 				<span>text content</span>
 			</div>
 		</div>
-		<!-- <script src="../node_modules/color-contrast-checker/dist/color-contrast-checker.umd.js"></script> -->
 		<script src="./dist/iife/colorContrast.js"></script>
 		<script>
 			try {
-				const container = document.querySelector("#container");
-				const getChecker = new colorContrast.ColorContrastChecker(container);
+				const getChecker = new colorContrast.ColorContrastChecker();
 				getChecker.init();
-
 				setTimeout(() => {
 					const divElement = document.createElement("div");
 					divElement.classList.add("box", "box--red");
 					divElement.textContent = "dummy element";
 					container.appendChild(divElement);
-				}, 10000);
+					const dummyContent = document.querySelector("#dummyContent");
+					dummyContent.style.backgroundColor = "#fcfcfc";
+				}, 2000);
 			} catch (error) {
 				console.error("Error initializing ColorContrastChecker:", error.message);
 			}
