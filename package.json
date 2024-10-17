@@ -1,6 +1,6 @@
 {
 	"name": "a11y-color-contrast-checker",
-	"version": "1.0.23",
+	"version": "1.0.24",
 	"description": "A lightweight utility for checking color contrast ratios between foreground and background colors in the DOM, ensuring accessibility compliance with WCAG guidelines. Perfect for web developers and designers aiming to create inclusive digital experiences",
 	"main": "dist/es5/colorContrast.js",
 	"module": "dist/es6/colorContrast.js",
