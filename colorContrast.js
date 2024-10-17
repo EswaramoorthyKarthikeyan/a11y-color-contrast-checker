@@ -16,7 +16,6 @@ class ColorContrastChecker {
 			console.info(`since you didn't pass the container Element, we will use the document body`);
 		}
 		this.containerElement = containerElement ? containerElement : document.body;
-
 		this.startCheck;
 	}
 
@@ -37,7 +36,7 @@ class ColorContrastChecker {
 						this.checkContrastForChildren(mutation.target);
 					} else if (mutation.type === "attributes") {
 						if (mutation.attributeName === "style" || mutation.attributeName === "class") {
-							this.checkContrastForChildren(mutation.target);
+							setTimeout(() => this.checkContrastForChildren(mutation.target), 5000);
 						}
 					}
 				}
@@ -46,8 +45,7 @@ class ColorContrastChecker {
 				childList: true,
 				subtree: true,
 				attributes: true,
-				attributeFilter: ["style"],
-				attributeOldValue: true,
+				attributeFilter: ["class", "style"],
 			});
 		}, 1);
 	}
@@ -74,6 +72,7 @@ class ColorContrastChecker {
 						this.colorUtil.getEffectiveColor(child, "bgColor"),
 						childStyle.color,
 					);
+
 					// check whether the element matches the criteria or not
 					const isLargeFont = childStyle.fontSize <= this.criteriaInfo.fontSize;
 					const isBold = childStyle.fontWeight <= this.criteriaInfo.fontWeight;
@@ -82,14 +81,6 @@ class ColorContrastChecker {
 					if (contrast < this.criteriaInfo.contrastThreshold) {
 						const currEleStyle = window.getComputedStyle(child);
 						child.setAttribute("data-color-contrast", contrast);
-
-						if (currEleStyle.borderWidth !== "0px") {
-							child.setAttribute(
-								"data-border",
-								`${currEleStyle.borderWidth} ${currEleStyle.borderStyle} ${currEleStyle.borderColor}`,
-							);
-						}
-
 						this.colorUtil.setStyle(child, this.styleObj);
 
 						const childStyleVal = {
@@ -101,11 +92,10 @@ class ColorContrastChecker {
 							contrastRatio: contrast,
 							content: child.textContent,
 						};
-						console.table(childStyleVal);
+						// console.table(childStyleVal);
 					} else {
-						if (child.hasAttribute("data-border")) {
-							const border = child.attributes["data-border"];
-							child.style.border = `${border.value}`;
+						if (child.hasAttribute("data-color-contrast")) {
+							child.style.border = "unset";
 						}
 					}
 				}
@@ -130,6 +120,7 @@ class ColorContrastChecker {
 		if (this.observer) {
 			this.observer.disconnect();
 		}
+		this.startCheck;
 	}
 }
 

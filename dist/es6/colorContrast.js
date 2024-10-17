@@ -1,7 +1,19 @@
-class C {
+class b {
   getColorFormat(t) {
     const r = /^#([A-Fa-f0-9]{3,4}){1,2}$/, e = /^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*([01]?\.?\d*))?\s*\)$/, n = /^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(?:,\s*([01]?\.?\d*))?\s*\)$/;
-    return r.test(t) ? "hex" : e.test(t) ? t.startsWith("rgba") ? "rgba" : "rgb" : n.test(t) ? t.startsWith("hsla") ? "hsla" : "hsl" : "unknown";
+    if (r.test(t))
+      return "hex";
+    if (e.test(t))
+      return t.startsWith("rgba") ? "rgba" : "rgb";
+    if (n.test(t))
+      return t.startsWith("hsla") ? "hsla" : "hsl";
+    if (t != "") {
+      let o = document.querySelector("#temp");
+      o || (o = document.createElement("div"), o.setAttribute("id", "temp")), o.style.backgroundColor = t;
+      const a = window.getComputedStyle(o).backgroundColor;
+      return this.parseColor(a);
+    } else
+      throw new Error(`Invalid color format: ${color}`);
   }
   hexToRgba(t, r = 1) {
     t = t.replace(/^#/, ""), t.length === 3 && (t = t.split("").map((a) => a + a).join(""));
@@ -13,25 +25,25 @@ class C {
     const o = (1 - Math.abs(2 * e - 1)) * r, a = e - o / 2;
     let i, l, s;
     t %= 360, t /= 60;
-    const d = Math.floor(t), h = t - d, g = o * (1 - h * h), c = o * (1 - h * h * h);
-    switch (d % 6) {
+    const h = Math.floor(t), c = t - h, d = o * (1 - c * c), g = o * (1 - c * c * c);
+    switch (h % 6) {
       case 0:
-        i = o, l = c, s = 0;
+        i = o, l = g, s = 0;
         break;
       case 1:
-        i = g, l = o, s = 0;
+        i = d, l = o, s = 0;
         break;
       case 2:
-        i = 0, l = o, s = c;
+        i = 0, l = o, s = g;
         break;
       case 3:
-        i = 0, l = g, s = o;
+        i = 0, l = d, s = o;
         break;
       case 4:
-        i = c, l = 0, s = o;
+        i = g, l = 0, s = o;
         break;
       case 5:
-        i = o, l = 0, s = g;
+        i = o, l = 0, s = d;
         break;
     }
     return i = Math.round((i + a) * 255), l = Math.round((l + a) * 255), s = Math.round((s + a) * 255), `rgba(${i}, ${l}, ${s}, ${n})`;
@@ -44,6 +56,8 @@ class C {
     throw new Error("Unsupported color format");
   }
   parseColor(t) {
+    if (t == "")
+      return "transparent";
     this.getColorFormat(t) !== "rgb" && this.getColorFormat(t) !== "rgba" && (t = this.toRgba(this.getColorFormat(t)));
     const r = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/, e = t.match(r);
     if (e)
@@ -56,7 +70,7 @@ class C {
     throw new Error(`Invalid color format: ${t}`);
   }
   isTransparent(t) {
-    return this.parseColor(t).a === 0 || t === "rgba(0, 0, 0, 0)" || t === "transparent";
+    return !t || t == "" ? "transparent" : this.parseColor(t).a === 0 || t === "rgba(0, 0, 0, 0)" || t === "transparent";
   }
   getRelativeLuminance({ r: t, g: r, b: e }) {
     const [n, o, a] = [t, r, e].map((i) => (i /= 255, i <= 0.03928 ? i / 12.92 : Math.pow((i + 0.055) / 1.055, 2.4)));
@@ -92,13 +106,13 @@ class C {
       t.style[e] = r[e];
   }
 }
-class f {
+class C {
   constructor(t, r, e) {
     this.criteriaInfo = r || { fontSize: "23.994px", fontWeight: 700, contrastThreshold: 4.5 }, this.styleObj = e || {
       "border-width": "2px",
       "border-style": "dashed",
       "border-color": "red"
-    }, this.colorUtil = new C(), t || console.info("since you didn't pass the container Element, we will use the document body"), this.containerElement = t || document.body, this.startCheck;
+    }, this.colorUtil = new b(), t || console.info("since you didn't pass the container Element, we will use the document body"), this.containerElement = t || document.body, this.startCheck;
   }
   init() {
     document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => this.startObserving()) : this.startObserving();
@@ -107,13 +121,12 @@ class f {
     this.startCheck = setTimeout(() => {
       this.checkContrastForChildren(), this.observer = new MutationObserver((t) => {
         for (var r of t)
-          r.type === "childList" ? this.checkContrastForChildren(r.target) : r.type === "attributes" && (r.attributeName === "style" || r.attributeName === "class") && this.checkContrastForChildren(r.target);
+          r.type === "childList" ? this.checkContrastForChildren(r.target) : r.type === "attributes" && (r.attributeName === "style" || r.attributeName === "class") && setTimeout(() => this.checkContrastForChildren(r.target), 5e3);
       }), this.observer.observe(this.containerElement, {
         childList: !0,
         subtree: !0,
         attributes: !0,
-        attributeFilter: ["style"],
-        attributeOldValue: !0
+        attributeFilter: ["class", "style"]
       });
     }, 1);
   }
@@ -126,30 +139,11 @@ class f {
           (s) => s.nodeType === Node.TEXT_NODE && s.textContent.trim() !== ""
         );
         if ("value" in e ? e.value !== "" && e.tagName.toLowerCase() === "li" && e.value !== 0 : i && e.textContent !== "") {
-          const s = this.colorUtil.getElementStyle(e), d = this.calculateContrastRatio(
+          const s = this.colorUtil.getElementStyle(e), h = this.calculateContrastRatio(
             this.colorUtil.getEffectiveColor(e, "bgColor"),
             s.color
-          ), h = s.fontSize <= this.criteriaInfo.fontSize, g = s.fontWeight <= this.criteriaInfo.fontWeight;
-          if (this.criteriaInfo.contrastThreshold = h && g ? 4.5 : 3.1, d < this.criteriaInfo.contrastThreshold) {
-            const c = window.getComputedStyle(e);
-            e.setAttribute("data-color-contrast", d), c.borderWidth !== "0px" && e.setAttribute(
-              "data-border",
-              `${c.borderWidth} ${c.borderStyle} ${c.borderColor}`
-            ), this.colorUtil.setStyle(e, this.styleObj);
-            const u = {
-              class: `${e.tagName.toLowerCase()}.${e.classList.value}`,
-              bgColor: this.colorUtil.getEffectiveColor(e, "bgColor"),
-              color: this.colorUtil.getEffectiveColor(e, "color"),
-              fontSize: s.fontSize,
-              fontWeight: s.fontWeight,
-              contrastRatio: d,
-              content: e.textContent
-            };
-            console.table(u);
-          } else if (e.hasAttribute("data-border")) {
-            const c = e.attributes["data-border"];
-            e.style.border = `${c.value}`;
-          }
+          ), c = s.fontSize <= this.criteriaInfo.fontSize, d = s.fontWeight <= this.criteriaInfo.fontWeight;
+          this.criteriaInfo.contrastThreshold = c && d ? 4.5 : 3.1, h < this.criteriaInfo.contrastThreshold ? (window.getComputedStyle(e), e.setAttribute("data-color-contrast", h), this.colorUtil.setStyle(e, this.styleObj), `${e.tagName.toLowerCase()}${e.classList.value}`, this.colorUtil.getEffectiveColor(e, "bgColor"), this.colorUtil.getEffectiveColor(e, "color"), s.fontSize, s.fontWeight, e.textContent) : e.hasAttribute("data-color-contrast") && (e.style.border = "unset");
         }
         e.children.length > 0 && this.checkContrastForChildren(e);
       }
@@ -160,10 +154,10 @@ class f {
     return (o + 0.05) / (a + 0.05);
   }
   destroy() {
-    this.observer && this.observer.disconnect();
+    this.observer && this.observer.disconnect(), this.startCheck;
   }
 }
 export {
-  f as ColorContrastChecker
+  C as ColorContrastChecker
 };
 //# sourceMappingURL=colorContrast.js.map

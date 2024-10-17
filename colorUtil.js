@@ -10,8 +10,17 @@ class ColorUtil {
 			return colorString.startsWith("rgba") ? "rgba" : "rgb";
 		} else if (hslaRegex.test(colorString)) {
 			return colorString.startsWith("hsla") ? "hsla" : "hsl";
+		} else if (colorString != "") {
+			let tempEle = document.querySelector("#temp");
+			if (!tempEle) {
+				tempEle = document.createElement("div");
+				tempEle.setAttribute("id", "temp");
+			}
+			tempEle.style.backgroundColor = colorString;
+			const tempColor = window.getComputedStyle(tempEle).backgroundColor;
+			return this.parseColor(tempColor);
 		} else {
-			return "unknown";
+			throw new Error(`Invalid color format: ${color}`);
 		}
 	}
 
@@ -98,6 +107,10 @@ class ColorUtil {
 	}
 
 	parseColor(color) {
+		if (color == "") {
+			return "transparent";
+		}
+
 		if (this.getColorFormat(color) !== "rgb" && this.getColorFormat(color) !== "rgba") {
 			color = this.toRgba(this.getColorFormat(color));
 		}
@@ -115,6 +128,10 @@ class ColorUtil {
 	}
 
 	isTransparent(color) {
+		if (!color || color == "") {
+			return "transparent";
+		}
+
 		const parsed = this.parseColor(color);
 		return parsed.a === 0 || color === "rgba(0, 0, 0, 0)" || color === "transparent";
 	}
