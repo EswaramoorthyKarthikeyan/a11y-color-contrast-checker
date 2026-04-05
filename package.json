@@ -1,17 +1,20 @@
 {
 	"name": "a11y-color-contrast-checker",
+	"private": true,
+	"sideEffects": false,
 	"version": "1.0.24",
 	"description": "A lightweight utility for checking color contrast ratios between foreground and background colors in the DOM, ensuring accessibility compliance with WCAG guidelines. Perfect for web developers and designers aiming to create inclusive digital experiences",
-	"main": "dist/es5/colorContrast.js",
-	"module": "dist/es6/colorContrast.js",
-	"browser": "dist/iife/colorContrast.js",
+	"main": "dist/es5/index.js",
+	"module": "dist/es6/index.js",
+	"browser": "dist/iife/index.js",
+	"types": "dist/types/index.d.ts",
 	"type": "module",
-	"directories": {
-		"dist": "dist"
-	},
 	"scripts": {
 		"cleanIns": "rm -rf node_modules && rm -rf package-lock.json && npm i",
-		"build": "vite build"
+		"build": "vite build",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest"
 	},
 	"keywords": [
 		"WCAG",
@@ -26,12 +29,18 @@
 	],
 	"author": "Eswaramoorthy karthikeyan <eswarkarthik95@gmail.com>",
 	"license": "MIT",
+	"engines": {
+		"node": ">=18"
+	},
 	"devDependencies": {
-		"@babel/cli": "^7.25.7",
-		"@babel/core": "^7.25.8",
-		"@babel/preset-env": "^7.25.8",
-		"babel-loader": "^9.2.1",
+		"happy-dom": "^15.7.0",
 		"prettier": "^3.3.3",
-		"vite": "^5.4.8"
+		"typescript": "^5.6.0",
+		"vite": "^5.4.8",
+		"vite-plugin-dts": "^4.2.0",
+		"vitest": "^2.1.0"
+	},
+	"dependencies": {
+		"style-observer": "^0.1.2"
 	}
 }

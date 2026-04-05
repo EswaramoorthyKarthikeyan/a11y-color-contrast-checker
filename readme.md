@@ -1,158 +1,368 @@
 # a11y-color-contrast-checker
 
-A color contrast checker for web developers to ensure your website meets WCAG (Web Content Accessibility Guidelines) standards for color contrast. This utility helps verify that text and background color combinations provide sufficient contrast for users with visual impairments, improving accessibility. During the development phase, it highlights elements in the DOM that do not meet the required standards.
+[![GitHub](https://img.shields.io/github/license/EswaramoorthyKarthikeyan/a11y-color-contrast-checker)](./license.md)
+[![GitHub stars](https://img.shields.io/github/stars/EswaramoorthyKarthikeyan/a11y-color-contrast-checker)](https://github.com/EswaramoorthyKarthikeyan/a11y-color-contrast-checker)
 
-## WCAG 2.1 - Success Criterion 1.4.3: Contrast (Minimum) (Level AA)
+A TypeScript color contrast checker that scans your page during development and highlights elements failing [WCAG 2.1](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html) contrast requirements with a hand‑drawn marker effect — no browser extension required.
 
-The visual presentation of text and images of text must have a contrast ratio of at least 4.5:1, except for the following:
+---
 
--   **Large Text**: Large-scale text and images of large-scale text should have a contrast ratio of at least 3:1.
--   **Incidental**: Text or images of text that are part of an inactive user interface component, pure decoration, invisible to users, or part of a picture containing significant other visual content have no contrast requirement.
--   **Logotypes**: Text that is part of a logo or brand name has no contrast requirement.
+## Table of Contents
 
-For more information, refer to the official [WCAG 2.1 guidelines](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html).
+- [WCAG 2.1 — SC 1.4.3](#wcag-21--sc-143-contrast-minimum-level-aa)
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [API Reference](#api-reference)
+- [Exports](#exports)
+- [Customizing the Highlight](#customizing-the-highlight)
+- [How It Works](#how-it-works)
+- [Browser Compatibility](#browser-compatibility)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## WCAG 2.1 — SC 1.4.3: Contrast (Minimum) (Level AA)
+
+The visual presentation of text and images of text must have a contrast ratio of at least **4.5:1**, except for the following:
+
+- **Large Text** — Large‑scale text (≥ 24 px, or ≥ 18.5 px **bold**) must have a contrast ratio of at least **3:1**.
+- **Incidental** — Text that is part of an inactive UI component, pure decoration, invisible, or part of a picture with significant other visual content has no contrast requirement.
+- **Logotypes** — Text that is part of a logo or brand name has no contrast requirement.
+
+See the [official WCAG 2.1 guidelines](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html) for full details.
+
+---
 
 ## Features
 
--   Checks color contrast between text and background according to WCAG 2.1 guidelines.
--   Highlights DOM elements that fail to meet the required contrast ratio.
--   Supports both ES6 and IIFE modules, making it easy to integrate into any project.
+- ✅ Checks color contrast against **WCAG 2.1 Level AA** thresholds (4.5:1 normal, 3:1 large text).
+- 🖍️ Highlights failing elements with a **hand‑drawn marker effect** via an injected `::after` pseudo‑element.
+- 🎨 Marker color and angle are **customizable** with CSS custom properties.
+- ⚡ Reacts to CSS property changes (`background-color`, `color`, `font-size`, `font-weight`) in real time using [`style-observer`](https://github.com/LeaVerou/style-observer).
+- 🔄 Detects DOM structure changes (added / removed elements) via `MutationObserver`.
+- 🎛️ Configurable WCAG criteria (contrast ratios, text‑size thresholds, bold weight).
+- 🎨 Supports **all CSS Color Level 4 formats**: hex, `rgb()`, `hsl()`, `hwb()`, `lab()`, `lch()`, `oklab()`, `oklch()`, `color()` (srgb, display-p3, a98-rgb, prophoto-rgb, rec2020, xyz, etc.), and named colors.
+- 🧪 **157 tests** (vitest + happy‑dom).
+- 📦 Ships with TypeScript `.d.ts` declarations.
+- 📤 Supports **ESM**, **CJS**, and **IIFE** output formats.
+
+---
 
 ## Installation
 
-Install the package using npm:
+### From GitHub
 
 ```bash
-npm install a11y-color-contrast-checker --save-dev
+npm install github:EswaramoorthyKarthikeyan/a11y-color-contrast-checker
 ```
 
-## Usage
+```bash
+pnpm add github:EswaramoorthyKarthikeyan/a11y-color-contrast-checker
+```
 
-### For ES6 Modules
+### From source
 
-You can use the package in your React or other ES6-based projects as shown below:
+```bash
+git clone https://github.com/EswaramoorthyKarthikeyan/a11y-color-contrast-checker.git
+cd a11y-color-contrast-checker
+pnpm install
+pnpm build
+```
 
-```js
+### CDN (IIFE)
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/EswaramoorthyKarthikeyan/a11y-color-contrast-checker@main/dist/iife/index.js"></script>
+```
+
+---
+
+## Quick Start
+
+### ES Modules (React example)
+
+```tsx
 import { useEffect } from "react";
-import "./App.css";
 import { ColorContrastChecker } from "a11y-color-contrast-checker";
 
 function App() {
-	useEffect(() => {
-		const getContainerElement = document.querySelector("#container");
-		// Creating instance for the iife class.
-		const colorChecker = new ColorContrastChecker(getContainerElement);
+  useEffect(() => {
+    const container = document.querySelector("#root");
+    const checker = new ColorContrastChecker(container);
+    checker.init();
 
-		// Initiatizing
-		colorChecker.init();
+    return () => checker.destroy();
+  }, []);
 
-		// Mutating the dom after 10 sec to check the plugin
-		setTimeout(() => {
-			const divElement = document.createElement("div");
-			divElement.classList.add("box", "box--red");
-			divElement.textContent = "dummy element";
-			getContainerElement.appendChild(divElement);
-		}, 10000);
-	}, []);
-
-	return (
-		<div className="container" id="container">
-			<div className="box box--white">text content</div>
-			<div className="box box--yellow">text content</div>
-			<div className="box box--orange">text content</div>
-			<div className="box box--transparent"></div>
-			<div className="box box--green">
-				<span className="tamil"> tamil </span>
-				text content
-			</div>
-			<div className="box box--dummy">
-				<span className="tamil"> tamil </span>
-				text content
-			</div>
-		</div>
-	);
+  return (
+    <div id="root">
+      <p style={{ background: "#fff", color: "#767676" }}>
+        This text will be flagged (ratio ≈ 4.48, below 4.5)
+      </p>
+      <p style={{ background: "#fff", color: "#000" }}>
+        This text is fine (ratio = 21)
+      </p>
+    </div>
+  );
 }
 
 export default App;
 ```
 
-## For IIFE (Immediately Invoked Function Expression)
-
-If you are not using a module bundler, you can include the package in your HTML page:
+### IIFE (script tag)
 
 ```html
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Color Contrast Checker</title>
-		<link href="./style.css" rel="stylesheet" />
-	</head>
-	<body>
-		<div class="container" id="container">
-			<div class="box box--white">text content</div>
-			<div class="box box--yellow">text content</div>
-			<div class="box box--orange">text content</div>
-			<div class="box box--transparent"></div>
-			<div class="box box--green">
-				<span class="tamil"> tamil </span>
-				text content
-			</div>
-			<div class="box box--dummy">
-				<span class="tamil"> tamil </span>
-				text content
-			</div>
-		</div>
-		<script src="../dist/iife/colorContrast.js"></script>
-		<script>
-			try {
-				// Creating instance for the iife class.
-				const getChecker = new colorContrast.ColorContrastChecke();
-				// Initiatizing
-				getChecker.init();
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contrast Checker Demo</title>
+  </head>
+  <body>
+    <div id="container">
+      <p style="background: #fff; color: #767676;">Low contrast text</p>
+    </div>
 
-				// Mutating the dom after 10 sec to check the plugin
-				setTimeout(() => {
-					const divElement = document.createElement("div");
-					divElement.classList.add("box", "box--red");
-					divElement.textContent = "dummy element";
-					container.appendChild(divElement);
-				}, 10000);
-			} catch (error) {
-				console.error("Error initializing ColorContrastChecker:", error.message);
-			}
-		</script>
-	</body>
+    <script src="https://cdn.jsdelivr.net/gh/EswaramoorthyKarthikeyan/a11y-color-contrast-checker@main/dist/iife/index.js"></script>
+    <script>
+      const checker = new colorContrast.ColorContrastChecker(
+        document.querySelector("#container"),
+      );
+      checker.init();
+    </script>
+  </body>
 </html>
 ```
 
-## API
+---
+
+## API Reference
+
+### `new ColorContrastChecker(container?, criteriaInfo?)`
+
+Creates a new checker instance.
+
+| Parameter      | Type                        | Default         | Description                                 |
+| -------------- | --------------------------- | --------------- | ------------------------------------------- |
+| `container`    | `HTMLElement \| null`       | `document.body` | The DOM subtree to scan for contrast issues. |
+| `criteriaInfo` | `CriteriaInfo \| undefined` | See below       | Optional WCAG criteria overrides.            |
+
+#### `CriteriaInfo`
+
+Pass a full `CriteriaInfo` object to override the defaults. The entire parameter is optional — when omitted, all defaults apply.
+
+```typescript
+interface CriteriaInfo {
+  /** Min font size (px) that counts as "large text" regardless of weight. */
+  largeTextMinSize: number; // default: 24
+
+  /** Min font size (px) that counts as "large text" when bold. */
+  largeTextBoldMinSize: number; // default: 18.5
+
+  /** Min font weight considered bold. */
+  boldMinWeight: number; // default: 700
+
+  /** Required contrast ratio for normal text. */
+  normalContrastRatio: number; // default: 4.5
+
+  /** Required contrast ratio for large text. */
+  largeContrastRatio: number; // default: 3
+}
+```
+
+**Example — enforce WCAG AAA thresholds:**
+
+```typescript
+const checker = new ColorContrastChecker(document.body, {
+  largeTextMinSize: 24,
+  largeTextBoldMinSize: 18.5,
+  boldMinWeight: 700,
+  normalContrastRatio: 7, // AAA
+  largeContrastRatio: 4.5, // AAA
+});
+```
+
+---
+
+### `init()`
+
+Starts scanning the container and begins observing for style and DOM changes. Failing elements are highlighted immediately.
+
+### `destroy()`
+
+Stops all observers, removes every highlight and `data-color-contrast` attribute from the DOM, and removes the injected stylesheet. Call this when the checker is no longer needed (e.g. in a React cleanup function).
+
+### `calculateContrastRatio(bgColor, textColor)`
+
+A public utility that returns the WCAG contrast ratio between two CSS color strings.
+
+```typescript
+const checker = new ColorContrastChecker();
+checker.calculateContrastRatio("rgb(255, 255, 255)", "rgb(118, 118, 118)");
+// → 4.48
+```
+
+---
+
+## Exports
+
+The package exposes both runtime exports and type exports:
+
+```typescript
+// Runtime
+import { ColorContrastChecker, ColorUtil } from "a11y-color-contrast-checker";
+
+// Types
+import type {
+  RGBAColor,
+  ColorFormat,
+  CriteriaInfo,
+  StyleObject,
+  ElementStyle,
+  ColorType,
+} from "a11y-color-contrast-checker";
+```
+
+| Export                   | Kind  | Description                                    |
+| ------------------------ | ----- | ---------------------------------------------- |
+| `ColorContrastChecker`   | class | Main checker — scan, observe, highlight.       |
+| `ColorUtil`              | class | Color parsing, luminance, alpha compositing.   |
+| `RGBAColor`              | type  | `{ r, g, b, a }` color object.                 |
+| `ColorFormat`            | type  | `"hex" \| "rgb" \| "rgba" \| "hsl" \| "hsla" \| "hwb" \| "oklch" \| "oklab" \| "lab" \| "lch" \| "color"` |
+| `CriteriaInfo`           | type  | WCAG criteria configuration.                   |
+| `StyleObject`            | type  | `Record<string, string>` for inline styles.    |
+| `ElementStyle`           | type  | `{ bgColor, color, fontSize, fontWeight }`     |
+| `ColorType`              | type  | `"bgColor" \| "color"`                         |
+
+---
+
+## Supported Color Formats
+
+`ColorUtil` can parse and convert **every CSS Color Level 4 format** to sRGB for contrast computation:
+
+| Format | Examples |
+| --- | --- |
+| **Hex** | `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa` |
+| **RGB** (legacy & modern) | `rgb(255, 0, 0)`, `rgb(255 0 0)`, `rgb(100% 0% 0% / 50%)` |
+| **HSL** (legacy & modern) | `hsl(120, 100%, 50%)`, `hsl(120deg 100% 50% / 0.5)` |
+| **HWB** | `hwb(0 0% 0%)`, `hwb(120deg 20% 10% / 0.8)` |
+| **Lab** | `lab(50 -20 30)`, `lab(50% -20 30 / 0.5)` |
+| **LCH** | `lch(50 30 270)`, `lch(50 30 270deg / 0.5)` |
+| **OKLab** | `oklab(0.7 -0.1 0.1)`, `oklab(70% -0.1 0.1 / 50%)` |
+| **OKLCH** | `oklch(0.7 0.15 180)`, `oklch(70% 0.15 180 / 0.5)` |
+| **`color()`** | `color(srgb 1 0 0)`, `color(display-p3 1 0 0 / 0.5)` |
+| **Named colors** | `red`, `rebeccapurple`, `transparent`, etc. |
+
+The `color()` function supports all predefined color spaces: `srgb`, `srgb-linear`, `display-p3`, `a98-rgb`, `prophoto-rgb`, `rec2020`, `xyz`, `xyz-d50`, `xyz-d65`.
+
+All formats support the `none` keyword (treated as `0`) and the `/` alpha syntax. Hue values accept angle units (`deg`, `rad`, `grad`, `turn`).
+
+---
+
+## Customizing the Highlight
+
+The marker effect is driven by two CSS custom properties. Override them on `:root` or any ancestor of the highlighted elements:
+
+| Property             | Default       | Description                             |
+| -------------------- | ------------- | --------------------------------------- |
+| `--a11y-mark-color`  | `255 100 185` | RGB channels for the marker (pink).     |
+| `--a11y-mark-angle`  | `150deg`      | Angle of the linear‑gradient fill.      |
+
+```css
+/* Red marker */
+[data-color-contrast]::after {
+  --a11y-mark-color: 255 50 50;
+  --a11y-mark-angle: 170deg;
+}
+
+/* Yellow marker */
+[data-color-contrast]::after {
+  --a11y-mark-color: 255 232 62;
+  --a11y-mark-angle: 50deg;
+}
+
+/* Green marker */
+[data-color-contrast]::after {
+  --a11y-mark-color: 91 233 92;
+  --a11y-mark-angle: 30deg;
+}
+```
+
+> **Tip:** Every failing element receives a `data-color-contrast` attribute whose value is the computed contrast ratio (e.g. `data-color-contrast="2.14"`). You can use this in CSS selectors or in DevTools to inspect specific failures.
+
+---
+
+## How It Works
 
 ```
-ColorContrastChecker(container)
+┌──────────────────────────────────────────────────┐
+│                  init()                          │
+│                                                  │
+│  1. Inject marker highlight <style>              │
+│  2. Initial full scan (recursive DOM walk)       │
+│  3. Start StyleObserver on:                      │
+│     background-color, color, font-size,          │
+│     font-weight                                  │
+│  4. Start MutationObserver on: childList         │
+│                                                  │
+│  ┌────────────────────┐  ┌────────────────────┐  │
+│  │   StyleObserver    │  │  MutationObserver   │  │
+│  │                    │  │                     │  │
+│  │ CSS prop changed?  │  │ Element added?      │  │
+│  │ → re-check element │  │ → observe + check   │  │
+│  │ → re-check children│  │                     │  │
+│  │   (if bg/color)    │  │ Element removed?    │  │
+│  │                    │  │ → unobserve         │  │
+│  └────────────────────┘  └─────────────────────┘  │
+│                                                  │
+│  For each text-bearing element:                  │
+│  ┌──────────────────────────────────────────┐    │
+│  │ 1. Skip hidden / disabled / aria-hidden  │    │
+│  │ 2. Walk up DOM → alpha-composite bg      │    │
+│  │ 3. Compute WCAG contrast ratio           │    │
+│  │ 4. Determine threshold (normal vs large) │    │
+│  │ 5. ratio < threshold → add marker        │    │
+│  │    ratio ≥ threshold → remove marker     │    │
+│  └──────────────────────────────────────────┘    │
+│                                                  │
+│                 destroy()                        │
+│  Disconnect observers, remove markers + styles   │
+└──────────────────────────────────────────────────┘
 ```
 
--   container: The DOM element or the container you want to check for color contrast issues.
+- **[`style-observer`](https://github.com/LeaVerou/style-observer)** by Lea Verou — uses CSS `transition` events to detect computed style changes from any source (class toggles, media queries, `:hover`, JavaScript, etc.).
+- **`MutationObserver`** — watches for structural DOM changes so newly added elements are automatically scanned.
+- **Alpha compositing** — semi‑transparent backgrounds are blended layer‑by‑layer up the ancestor chain using the standard "source over" formula to compute the actual visual background color.
 
-`init()`
+---
 
--   Initializes the checker and scans the provided container for any elements that fail to meet WCAG standards.
+## Browser Compatibility
 
-`destroy()`
+This library depends on [`style-observer`](https://github.com/LeaVerou/style-observer), which requires CSS transition support for detecting property changes:
 
--   Use it when you're done observing changes to clean up resources efficiently.
+| Browser | Minimum Version |
+| ------- | --------------- |
+| Chrome  | 97+             |
+| Safari  | 15.4+           |
+| Firefox | 104+            |
+
+---
+
+## Contributing
+
+1. Fork the [repository](https://github.com/EswaramoorthyKarthikeyan/a11y-color-contrast-checker).
+2. Clone your fork: `git clone https://github.com/<your-username>/a11y-color-contrast-checker.git`
+3. Install dependencies: `pnpm install`
+4. Build: `pnpm build`
+5. Run tests: `pnpm test`
+6. Type‑check: `pnpm typecheck`
+7. Submit a pull request.
+
+---
 
 ## License
 
-This project is licensed under the MIT License.
-
-
-## Exmaple
-
-<img width="427" alt="Screenshot 2024-10-17 at 00 19 25" src="https://github.com/user-attachments/assets/2c7cb13b-93fd-4532-9134-7acfdaf07de1">
-
-
-
-
-
+[MIT](./license.md) © Eswaramoorthy Karthikeyan

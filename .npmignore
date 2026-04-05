@@ -1,8 +1,0 @@
-node_modules
-color-contrast-checker
-src
-.prettierrc
-*.html
-*.css
-*.map
-vite.config.js
